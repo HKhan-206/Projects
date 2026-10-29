@@ -224,6 +224,14 @@
     document.body.setAttribute("data-ready", "1");
   });
 
-  // Reload once an hour so edits to menu-data.js show up without touching the TV
-  setTimeout(function () { location.reload(); }, 60 * 60 * 1000);
+  // Once an hour, reload so edits to menu-data.js show up without touching the TV.
+  // Only reload if the menu can be reached, so a dropped internet connection
+  // never replaces the menu with an error page – it just tries again later.
+  function refresh() {
+    if (location.protocol === "file:") { location.reload(); return; }
+    fetch("menu-data.js?check=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { if (r.ok) location.reload(); else setTimeout(refresh, 5 * 60 * 1000); })
+      .catch(function () { setTimeout(refresh, 5 * 60 * 1000); });
+  }
+  setTimeout(refresh, 60 * 60 * 1000);
 })();
