@@ -307,7 +307,7 @@ window.MENU = {
           list: ["Coke", "Diet Coke", "Fanta Fruit Twist", "Irn Bru", "Oasis"] },
         { name: "1.25 Bottles", price: "3.49",
           list: ["Coke", "Diet Coke"] },
-        ["Water bottle", "0.99"]
+        ["Water Bottle", "0.99"]
       ]
     }
   },
