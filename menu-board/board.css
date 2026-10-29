@@ -12,10 +12,10 @@
   --ink: #0B0B0B;                 /* black writing */
   --ink-soft: rgba(11, 11, 11, 0.72);
   --rule: rgba(11, 11, 11, 0.22);
-  --orange: #EB5A0C;
+  --orange: #EA6D4D;
   --fs: 28px;                     /* base text size – set automatically by board.js */
-  --safe: 44px;                   /* safe margin from the screen edge */
-  --gap: 30px;                    /* space between sections */
+  --safe: 38px;                   /* safe margin from the screen edge */
+  --gap: 22px;                    /* space between sections */
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,10 +33,10 @@ html, body {
   left: 50%; top: 50%;
   width: 1080px; height: 1920px;
   transform-origin: center center;
-  /* Supplied background, shown at its original size and colours.
-     It is 970px wide, so it repeats sideways to cover the 1080px width. */
+  /* Supplied background pattern, recoloured to the logo orange (#EA6D4D)
+     with a softer pattern. 970px wide, so it repeats sideways to cover 1080px. */
   background-color: var(--orange);
-  background-image: url(assets/background.jpg);
+  background-image: url(assets/background-logo-orange.jpg);
   background-repeat: repeat-x;
   background-position: center center;
   background-size: auto;
@@ -59,17 +59,18 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: var(--gap);
+  justify-content: space-between;
   font-size: var(--fs);
 }
 
-.block { flex: 1 0 auto; display: flex; }
+.block { flex: 0 0 auto; display: flex; }
 .block > .panel { flex: 1; }
 
 .split {
-  flex: 1 0 auto;
+  flex: 0 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  column-gap: 34px;
+  column-gap: 28px;
 }
 .col { display: flex; flex-direction: column; gap: var(--gap); min-width: 0; }
 .col > .panel { flex: 1 0 auto; }
@@ -120,8 +121,8 @@ html, body {
 }
 .price {
   justify-content: flex-end;
-  gap: 0.2em;
-  padding-left: 0.5em;
+  gap: 0.18em;
+  padding-left: 0.4em;
   font-family: "Barlow Condensed", sans-serif;
   font-weight: 700;
   font-size: 1.1em;
@@ -137,10 +138,10 @@ html, body {
   color: var(--ink-soft);
 }
 .price .lbl { font-size: 0.47em; }
-.price.plus { font-size: 0.95em; font-weight: 600; padding-left: 0.45em; }
+.price.plus { font-size: 0.95em; font-weight: 600; padding-left: 0.4em; }
 .head {
   justify-content: flex-end;
-  padding-left: 0.5em;
+  padding-left: 0.4em;
   font-size: 0.56em;
   border-bottom-color: transparent;
   white-space: nowrap;
@@ -165,6 +166,7 @@ html, body {
 .single-items { flex: 1; display: flex; flex-direction: column; }
 .single-items > .items { flex: 1; }
 .split-items { flex: 1; display: grid; grid-template-columns: 1fr 1fr; column-gap: 1.4em; }
+.split-items > .items { align-content: start; }
 
 /* Add-ons ("Make it a Meal +2.50") and short info lines under a section */
 .extras {
@@ -205,3 +207,14 @@ html, body {
   text-wrap: balance;
 }
 .info.small { font-size: 0.72em; font-weight: 500; color: var(--ink-soft); margin-top: -0.2em; }
+
+/* Names listed under a drinks group */
+.list {
+  font-family: "Barlow Semi Condensed", sans-serif;
+  font-weight: 500;
+  font-size: 0.74em;
+  line-height: 1.22;
+  padding: 0.05em 0 0.3em;
+  border-bottom: 1px solid var(--rule);
+}
+.items > .list.last { border-bottom-color: transparent; }

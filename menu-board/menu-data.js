@@ -14,6 +14,9 @@
    - A price with a small label in front:  { l: "Only", p: "3.99" }
    - extras: [["Make it a Meal", "+2.50"]]  = add-on tags under a section
    - info: ["..."]  = a short line of information under a section
+   - A group with one price and a list of names (used for Drinks):
+       { name: "Cans", price: "1.39", list: ["Coke", "Pepsi"] }
+   - split: 2  = show that section in 2 columns side by side
 
    Each item is:  ["Name", price, price, ...]
    In sections with column headings (head), the prices line up
@@ -31,6 +34,7 @@ window.MENU = {
 
     starters: {
       title: "Starters",
+      split: 2,          // shown in two columns side by side
       items: [
         ["2x Seekh Kebabs", "3.49"],
         ["2x Meat Samosas", "3.29"],
@@ -201,6 +205,7 @@ window.MENU = {
 
     sauces: {
       title: "Sauces",
+      split: 3,          // shown in three columns side by side
       items: [
         ["Chilli Sauce", "0.50"],
         ["Garlic Sauce", "0.50"],
@@ -217,6 +222,7 @@ window.MENU = {
 
     cakes: {
       title: "Cakes",
+      split: 2,          // shown in two columns side by side
       items: [
         ["Chocolate Gateau", "3.49"],
         ["Matilda Fudge Cake", "5.49"],
@@ -293,31 +299,15 @@ window.MENU = {
     drinks: {
       title: "Drinks",
       items: [
-        ["Coke", "1.39"],
-        ["Coke Zero", "1.39"],
-        ["Diet Coke", "1.39"],
-        ["Dr Pepper", "1.39"],
-        ["Fanta Fruit Twist", "1.39"],
-        ["Irn-Bru", "1.39"],
-        ["Pepsi", "1.39"],
-        ["Pepsi Max", "1.39"],
-        ["Vimto", "1.39"],
-        ["7up", "1.39"],
-        ["Rio", "1.39"],
-        ["Irn Bru Xtra", "1.39"],
-        ["Rubicon Mango", "1.39"],
-        ["Rubicon Guava", "1.39"],
-        ["Rubicon Passion", "1.39"],
-        ["Tango", "1.39"],
-        ["Strawberry Miranda", "1.39"],
-        ["Water bottle", "0.99"],
-        ["Coke Bottle 0.5", "1.99"],
-        ["Diet Coke Bottle 0.5", "1.99"],
-        ["Fanta Fruit Twist Bottle 0.5", "1.99"],
-        ["Irn Bru Bottle 0.5", "1.99"],
-        ["Oasis Bottle 0.5", "1.99"],
-        ["Coke Bottle 1.25", "3.49"],
-        ["Diet Coke Bottle 1.25", "3.49"]
+        { name: "Cans", price: "1.39",
+          list: ["Coke", "Coke Zero", "Diet Coke", "Dr Pepper", "Fanta Fruit Twist", "Irn Bru", "Pepsi",
+                 "Pepsi Max", "Vimto", "7up", "Rio", "Irn Bru Xtra", "Rubicon Mango", "Rubicon Guava",
+                 "Rubicon Passion", "Tango", "Strawberry Miranda"] },
+        { name: "0.5 Bottles", price: "1.99",
+          list: ["Coke", "Diet Coke", "Fanta Fruit Twist", "Irn Bru", "Oasis"] },
+        { name: "1.25 Bottles", price: "3.49",
+          list: ["Coke", "Diet Coke"] },
+        ["Water bottle", "0.99"]
       ]
     }
   },
@@ -340,7 +330,9 @@ window.MENU = {
       "sides"
     ],
     3: [
-      { left: ["sauces", "cakes", "milkshakes"], right: ["cookie", "icecream", "slushes", "drinks"] }
+      "sauces",
+      "cakes",
+      { left: ["milkshakes"], right: ["cookie", "icecream", "slushes", "drinks"], widths: "46fr 54fr" }
     ]
   }
 };

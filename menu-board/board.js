@@ -48,6 +48,15 @@
         part.items.forEach(function (it) { if (Array.isArray(it)) m = Math.max(m, it.length - 1); });
         wrap.appendChild(buildGrid({ head: part.head, group: part.group }, part.items, Math.max(m, 1)));
       });
+    } else if (s.split > 1) { // same list spread over several columns
+      wrap = el("div", "split-items");
+      wrap.style.gridTemplateColumns = "repeat(" + s.split + ", 1fr)";
+      var at = 0;
+      for (var q = 0; q < s.split; q++) { // spread items as evenly as possible, e.g. 10 -> 4, 3, 3
+        var size = Math.ceil((s.items.length - at) / (s.split - q));
+        wrap.appendChild(buildGrid(s, s.items.slice(at, at + size), n));
+        at += size;
+      }
     } else {
       wrap = el("div", "single-items");
       wrap.appendChild(buildGrid(s, s.items, n));
@@ -92,7 +101,20 @@
     if (s.head) headRow(s.head);
 
     items.forEach(function (it) {
-      if (!Array.isArray(it)) { if (it.head) headRow(it.head); return; }
+      if (!Array.isArray(it)) {
+        if (it.head) headRow(it.head);
+        if (it.list) { // group: one price, names listed underneath
+          var gr = [el("div", "name cont", it.name)];
+          for (var g2 = 1; g2 < n; g2++) gr.push(priceCell(""));
+          gr.push(priceCell(it.price));
+          gr.forEach(function (c) { c.classList.add("cont"); });
+          rows.push(gr);
+          var li = el("div", "list", it.list.map(function (d) { return d.replace(/ /g, "\u00A0"); }).join("  ·  "));
+          li.style.gridColumn = "1 / -1";
+          rows.push([li]);
+        }
+        return;
+      }
       var prices = it.slice(1);
       var start = 0;
       do { // more prices than columns: continue on the next line
@@ -136,7 +158,7 @@
   }
 
   // Pick the largest text size that fits on the screen without overflow,
-  // preferring a size where no item name has to wrap onto two lines
+  // allowing at most 2 long item names to wrap onto a second line
   function fit() {
     var names = board.querySelectorAll(".name");
     var panels = board.querySelectorAll(".panel");
@@ -147,10 +169,12 @@
         if (panels[i].scrollWidth > panels[i].clientWidth + 1) return false;
       }
       if (noWrap) {
+        var count = 0;
         for (var j = 0; j < names.length; j++) {
           var n = names[j];
-          if (n.textContent && n.getClientRects().length && wrapped(n, px)) return false;
+          if (n.textContent && n.getClientRects().length && wrapped(n, px)) count++;
         }
+        if (count > 2) return false;
       }
       return true;
     }

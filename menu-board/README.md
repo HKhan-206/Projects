@@ -56,6 +56,8 @@ Edit **`menu-data.js`** with any text editor (Notepad is fine). Each item is one
 - Burgers have Double / Triple columns and Kebabs have a Meal column – these are
   normal price columns, so edit them like any other price (`""` = not available).
 - The Steak House "served on…" line is the `info:` line.
+- Drinks are grouped: `{ name: "Cans", price: "1.39", list: ["Coke", ...] }` – add or remove
+  names in the list, or change the group price.
 
 Save, then refresh the TV browser (F5). The screens also reload by themselves every hour.
 The text size adjusts automatically so everything still fits on the screen.
@@ -67,7 +69,9 @@ Which sections go on which screen is at the bottom of `menu-data.js` (`screens:`
 - `menu-data.js` – all menu text and prices, plus which screen each section is on
 - `board.css` – colours, fonts and spacing
 - `board.js` – draws the screens (no need to edit)
-- `assets/background.jpg` – the supplied orange background, used unchanged at its original size
+- `assets/background-logo-orange.jpg` – the background in use: the supplied pattern recoloured to the
+  logo orange (#EA6D4D) with a softer pattern
+- `assets/background.jpg` – the original background as supplied (kept for reference)
 - `assets/triangle.png` – the small triangle mark from the logo (top-right corner of each screen)
 - `assets/logo.png` – the full logo cut-out (used only on the start page)
 - `fonts/` – fonts stored locally so no internet is needed
