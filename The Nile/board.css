@@ -1,0 +1,231 @@
+/* The Nile – menu board styles. Each screen is 1080 x 1920 (portrait).
+   Black writing directly on the supplied orange background. */
+
+@font-face { font-family: "Montserrat"; font-weight: 700; src: url(fonts/montserrat-latin-700-normal.woff2) format("woff2"); }
+@font-face { font-family: "Montserrat"; font-weight: 800; src: url(fonts/montserrat-latin-800-normal.woff2) format("woff2"); }
+@font-face { font-family: "Barlow Semi Condensed"; font-weight: 500; src: url(fonts/barlow-semi-condensed-latin-500-normal.woff2) format("woff2"); }
+@font-face { font-family: "Barlow Semi Condensed"; font-weight: 600; src: url(fonts/barlow-semi-condensed-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 600; src: url(fonts/barlow-condensed-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 700; src: url(fonts/barlow-condensed-latin-700-normal.woff2) format("woff2"); }
+
+:root {
+  --ink: #0B0B0B;                 /* black writing */
+  --ink-soft: rgba(11, 11, 11, 0.72);
+  --rule: rgba(11, 11, 11, 0.22);
+  --orange: #EA6D4D;
+  --fs: 28px;                     /* base text size – set automatically by board.js */
+  --safe: 38px;                   /* safe margin from the screen edge */
+  --gap: 22px;                    /* space between sections */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #000;
+  cursor: none;
+}
+
+/* Fixed 1080x1920 stage, scaled to fit whatever screen it is shown on */
+#stage {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 1080px; height: 1920px;
+  transform-origin: center center;
+  /* Supplied background pattern, recoloured to the logo orange (#EA6D4D)
+     with a softer pattern. 970px wide, so it repeats sideways to cover 1080px. */
+  background-color: var(--orange);
+  background-image: url(assets/background-logo-orange.jpg);
+  background-repeat: repeat-x;
+  background-position: center center;
+  background-size: auto;
+  overflow: hidden;
+  color: var(--ink);
+}
+
+/* Small triangle mark in the top-right corner, outside the menu area */
+.mark {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 30px;
+  height: auto;
+}
+
+#board {
+  position: absolute;
+  inset: var(--safe);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  justify-content: space-between;
+  font-size: var(--fs);
+}
+
+.block { flex: 0 0 auto; display: flex; }
+.block > .panel { flex: 1; }
+
+.split {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 28px;
+}
+.col { display: flex; flex-direction: column; gap: var(--gap); min-width: 0; }
+.col > .panel { flex: 1 0 auto; }
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.title {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 800;
+  font-size: 1.2em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  margin-bottom: 0.12em;
+}
+.title::after {
+  content: "";
+  flex: 1;
+  height: 3px;
+  background: var(--ink);
+}
+
+/* Item table: name column + one column per price */
+.items {
+  display: grid;
+  align-content: space-evenly;
+  flex: 1;
+  line-height: 1.12;
+}
+
+.name, .price, .head, .group, .blank {
+  padding: 0.16em 0;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+}
+.name {
+  font-family: "Barlow Semi Condensed", sans-serif;
+  font-weight: 600;
+  padding-right: 0.4em;
+}
+.price {
+  justify-content: flex-end;
+  gap: 0.18em;
+  padding-left: 0.4em;
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  font-size: 1.1em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.price .lbl, .head, .group {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 800;
+  font-size: 0.5em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.price .lbl { font-size: 0.47em; }
+.price.plus { font-size: 0.95em; font-weight: 600; padding-left: 0.4em; }
+.head {
+  justify-content: flex-end;
+  padding-left: 0.4em;
+  font-size: 0.56em;
+  border-bottom-color: transparent;
+  white-space: nowrap;
+}
+.group {
+  justify-content: center;
+  padding-left: 1em;
+  padding-bottom: 0;
+  font-size: 0.56em;
+  color: var(--ink);
+  border-bottom-color: transparent;
+}
+.group span {
+  width: 100%;
+  text-align: center;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 0.1em;
+}
+.items > .last, .items > .cont { border-bottom-color: transparent; }
+.items > .cont { padding-bottom: 0; }
+
+.single-items { flex: 1; display: flex; flex-direction: column; }
+.single-items > .items { flex: 1; }
+.split-items { flex: 1; display: grid; grid-template-columns: 1fr 1fr; column-gap: 1.4em; }
+.split-items > .items { align-content: start; }
+
+/* Add-ons ("Make it a Meal +2.50") and short info lines under a section */
+.extras {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3em 0.4em;
+  margin-top: 0.3em;
+}
+.tag {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45em;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.16em 0.75em 0.18em;
+}
+.tag-l {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 800;
+  font-size: 0.56em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.tag-p {
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  font-size: 1em;
+  color: #FF9A5C;
+}
+.info {
+  width: 100%;
+  font-family: "Barlow Semi Condensed", sans-serif;
+  font-weight: 600;
+  font-size: 0.86em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+.info.small { font-size: 0.72em; font-weight: 500; color: var(--ink-soft); margin-top: -0.2em; }
+
+/* Names listed under a drinks group */
+.list {
+  font-family: "Barlow Semi Condensed", sans-serif;
+  font-weight: 500;
+  font-size: 0.74em;
+  line-height: 1.22;
+  padding: 0.05em 0 0.3em;
+  border-bottom: 1px solid var(--rule);
+}
+.items > .list.last { border-bottom-color: transparent; }
+
+/* Small toppings text after a pizza name (same line, so rows don't get taller) */
+.name.has-desc { align-items: baseline; gap: 0.55em; }
+.desc {
+  font-family: "Barlow Semi Condensed", sans-serif;
+  font-weight: 500;
+  font-size: 0.72em;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  text-transform: lowercase;
+}
