@@ -81,7 +81,7 @@ window.MENU = {
       toppings: {
         "Asian Style Pizza": "chicken, sweetcorn, onions, peppers, chillies",
         "Caribbean Pizza": "tuna, pineapple",
-        "Chicken Feast Pizza": "chicken, mushroom, pineapple, sweetcorn",
+        "Chicken Feast Pizza": "chicken, mushrooms, pineapple, sweetcorn",
         "Chicken and Pineapple Pizza": "chicken, pineapple",
         "Chicken Tikka Special Pizza": "chicken, jalapeños",
         "Donner Delight Pizza": "donner",

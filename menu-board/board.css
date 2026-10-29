@@ -224,7 +224,8 @@ html, body {
 .desc {
   font-family: "Barlow Semi Condensed", sans-serif;
   font-weight: 500;
-  font-size: 0.6em;
+  font-size: 0.72em;
   color: var(--ink-soft);
   white-space: nowrap;
+  text-transform: lowercase;
 }
