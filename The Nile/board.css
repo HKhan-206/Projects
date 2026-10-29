@@ -178,13 +178,16 @@ html, body {
 }
 .tag {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;       /* text sits in the middle of the black pill */
+  justify-content: center;
   gap: 0.45em;
   background: var(--ink);
   color: #fff;
   border-radius: 999px;
-  padding: 0.16em 0.75em 0.18em;
+  padding: 0.26em 0.85em;
+  line-height: 1;
 }
+.tag-l, .tag-p { display: block; line-height: 1; }
 .tag-l {
   font-family: "Montserrat", sans-serif;
   font-weight: 800;
