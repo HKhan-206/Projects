@@ -68,7 +68,7 @@ window.MENU = {
         ["Pollo Pizza", "3.49", "6.99", "8.99", "12.99"],
         ["Seafood Pizza", "3.99", "7.49", "9.99", "13.49"],
         ["Steak Grill Mixed Pizza", "4.49", "7.99", "10.99", "13.99"],
-        ["Tuna and Sweet Corn Pizza", "3.49", "6.99", "8.99", "12.99"],
+        ["Tuna and Sweetcorn Pizza", "3.49", "6.99", "8.99", "12.99"],
         ["Vegetarian Pizza", "3.49", "6.99", "8.99", "12.99"],
         ["Vegetarian Hot Pizza", "3.49", "6.99", "8.99", "12.99"],
         ["Vegetarian Sweet Pizza", "3.49", "6.99", "8.99", "12.99"],
