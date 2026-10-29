@@ -218,3 +218,13 @@ html, body {
   border-bottom: 1px solid var(--rule);
 }
 .items > .list.last { border-bottom-color: transparent; }
+
+/* Small toppings text after a pizza name (same line, so rows don't get taller) */
+.name.has-desc { align-items: baseline; gap: 0.55em; }
+.desc {
+  font-family: "Barlow Semi Condensed", sans-serif;
+  font-weight: 500;
+  font-size: 0.6em;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}

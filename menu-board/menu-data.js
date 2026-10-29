@@ -17,6 +17,7 @@
    - A group with one price and a list of names (used for Drinks):
        { name: "Cans", price: "1.39", list: ["Coke", "Pepsi"] }
    - split: 2  = show that section in 2 columns side by side
+   - toppings: { "Pizza Name": "chicken, sweetcorn" } = small writing after a name
 
    Each item is:  ["Name", price, price, ...]
    In sections with column headings (head), the prices line up
@@ -76,6 +77,32 @@ window.MENU = {
         ["Asian Style Calzone", "", "7.49", "9.99", "12.49"],
         ["Calzone Pizza", "", "7.99", "10.99", "13.99"]
       ],
+      // small writing after the pizza name (name must match exactly)
+      toppings: {
+        "Asian Style Pizza": "chicken, sweetcorn, onions, peppers, chillies",
+        "Caribbean Pizza": "tuna, pineapple",
+        "Chicken Feast Pizza": "chicken, mushroom, pineapple, sweetcorn",
+        "Chicken and Pineapple Pizza": "chicken, pineapple",
+        "Chicken Tikka Special Pizza": "chicken, jalapeños",
+        "Donner Delight Pizza": "donner",
+        "Hawaiian Pizza": "ham, pineapple",
+        "Hot Spicy Mince Pizza": "mince, chillies",
+        "Hot and Spicy Pizza": "pepperoni, mince, onions, jalapeños",
+        "Meat Feast Pizza": "chicken, pepperoni, mince",
+        "Mexican Special Pizza": "peppers, onions, chillies, sweetcorn",
+        "Nile Special Pizza": "pepperoni, onions, sweetcorn, mushrooms, peppers",
+        "Pepperoni Special Pizza": "pepperoni, onions, mushrooms",
+        "Pepperoni Pizza": "pepperoni",
+        "Pollo Pizza": "chicken, sweetcorn",
+        "Seafood Pizza": "prawns, tuna",
+        "Steak Grill Mixed Pizza": "steak, chicken, donner",
+        "Tuna and Sweetcorn Pizza": "tuna, sweetcorn",
+        "Vegetarian Pizza": "onions, sweetcorn, mushrooms, peppers",
+        "Vegetarian Hot Pizza": "onions, sweetcorn, mushrooms, peppers, chillies",
+        "Vegetarian Sweet Pizza": "onions, sweetcorn, mushrooms, peppers, pineapple",
+        "Asian Style Calzone": "chicken, sweetcorn, onions, peppers, chillies",
+        "Calzone Pizza": "donner, pepperoni, onions"
+      },
       extras: [["Make it a Meal", "+2.50"]]
     },
 

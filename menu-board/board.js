@@ -120,6 +120,8 @@
       do { // more prices than columns: continue on the next line
         var chunk = prices.slice(start, start + n);
         var r = [el("div", "name", start === 0 ? it[0] : "")];
+        var desc = start === 0 && s.toppings && s.toppings[it[0]];
+        if (desc) { r[0].classList.add("has-desc"); r[0].appendChild(el("span", "desc", desc)); }
         for (var i = chunk.length; i < n; i++) r.push(priceCell("")); // short rows sit on the right
         chunk.forEach(function (v) { r.push(priceCell(v)); });
         if (start > 0) rows[rows.length - 1].forEach(function (c) { c.classList.add("cont"); });
