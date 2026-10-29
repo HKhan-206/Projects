@@ -52,7 +52,10 @@ Edit **`menu-data.js`** with any text editor (Notepad is fine). Each item is one
 - Remove an item: delete the line.
 - Blank price space: `""`.
 - Price with a small label: `{ l: "Only", p: "3.99" }`.
-- Notes under a section are the `note:` lines.
+- Add-on tags under a section (e.g. "Make it a Meal +2.50") are the `extras:` lines.
+- Burgers have Double / Triple columns and Kebabs have a Meal column – these are
+  normal price columns, so edit them like any other price (`""` = not available).
+- The Steak House "served on…" line is the `info:` line.
 
 Save, then refresh the TV browser (F5). The screens also reload by themselves every hour.
 The text size adjusts automatically so everything still fits on the screen.
@@ -65,7 +68,8 @@ Which sections go on which screen is at the bottom of `menu-data.js` (`screens:`
 - `board.css` – colours, fonts and spacing
 - `board.js` – draws the screens (no need to edit)
 - `assets/background.jpg` – the supplied orange background, used unchanged at its original size
-- `assets/logo.png` – The Nile logo (cut out from the supplied artwork)
+- `assets/triangle.png` – the small triangle mark from the logo (top-right corner of each screen)
+- `assets/logo.png` – the full logo cut-out (used only on the start page)
 - `fonts/` – fonts stored locally so no internet is needed
 
 ## Hosting on GitHub Pages (optional)

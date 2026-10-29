@@ -21,19 +21,12 @@
       c.appendChild(el("span", "val", v.p));
     } else if (v) {
       c.appendChild(el("span", "val", v));
+      if (v.charAt(0) === "+") c.classList.add("plus");
     }
     return c;
   }
 
   function buildSection(key) {
-    if (key === "logo") {
-      var lp = el("div", "panel logo-panel");
-      var img = el("img");
-      img.src = "assets/logo.png";
-      img.alt = "The Nile";
-      lp.appendChild(img);
-      return lp;
-    }
     var s = menu.sections[key];
     if (!s) { console.warn("Unknown section:", key); return el("div"); }
 
@@ -60,7 +53,17 @@
       wrap.appendChild(buildGrid(s, s.items, n));
     }
     panel.appendChild(wrap);
-    if (s.note) panel.appendChild(el("div", "note", s.note));
+    if (s.extras || s.info) {
+      var ex = el("div", "extras");
+      (s.extras || []).forEach(function (x) {
+        var tag = el("div", "tag");
+        tag.appendChild(el("span", "tag-l", x[0]));
+        tag.appendChild(el("span", "tag-p", x[1]));
+        ex.appendChild(tag);
+      });
+      (s.info || []).forEach(function (t, i) { ex.appendChild(el("div", i ? "info small" : "info", t)); });
+      panel.appendChild(ex);
+    }
     return panel;
   }
 
@@ -81,7 +84,7 @@
       s.group.forEach(function (gr) {
         var c = el("div", "group");
         c.style.gridColumn = "span " + gr[1];
-        c.appendChild(el("span", null, gr[0]));
+        if (gr[0]) c.appendChild(el("span", null, gr[0]));
         g.push(c);
       });
       rows.push(g);
@@ -132,23 +135,46 @@
     });
   }
 
-  // Pick the largest text size that fits on the screen without overflow
+  // Pick the largest text size that fits on the screen without overflow,
+  // preferring a size where no item name has to wrap onto two lines
   function fit() {
-    var lo = 14, hi = 44;
-    function fits(px) {
+    var names = board.querySelectorAll(".name");
+    var panels = board.querySelectorAll(".panel");
+    function fits(px, noWrap) {
       board.style.setProperty("--fs", px + "px");
       if (board.scrollHeight > board.clientHeight + 1) return false;
-      var cells = board.querySelectorAll(".panel");
-      for (var i = 0; i < cells.length; i++) {
-        if (cells[i].scrollWidth > cells[i].clientWidth + 1) return false;
+      for (var i = 0; i < panels.length; i++) {
+        if (panels[i].scrollWidth > panels[i].clientWidth + 1) return false;
+      }
+      if (noWrap) {
+        for (var j = 0; j < names.length; j++) {
+          var n = names[j];
+          if (n.textContent && n.getClientRects().length && wrapped(n, px)) return false;
+        }
       }
       return true;
     }
-    for (var k = 0; k < 14; k++) {
-      var mid = (lo + hi) / 2;
-      if (fits(mid)) lo = mid; else hi = mid;
+    function wrapped(n, px) {
+      var r = document.createRange();
+      r.selectNodeContents(n);
+      var lines = {}, rects = r.getClientRects(), count = 0;
+      for (var i = 0; i < rects.length; i++) {
+        var key = Math.round(rects[i].top);
+        if (!lines[key]) { lines[key] = 1; count++; }
+      }
+      return count > 1;
     }
-    fits(Math.floor(lo * 4) / 4);
+    function search(noWrap) {
+      var lo = 14, hi = 44;
+      for (var k = 0; k < 14; k++) {
+        var mid = (lo + hi) / 2;
+        if (fits(mid, noWrap)) lo = mid; else hi = mid;
+      }
+      return Math.floor(lo * 4) / 4;
+    }
+    var best = search(true);
+    if (best < 21) best = search(false); // too small: allow some names to wrap instead
+    fits(best, false);
   }
 
   // Scale the 1080x1920 stage to the real screen
@@ -161,6 +187,10 @@
   }
 
   build();
+  var mark = el("img", "mark");
+  mark.src = "assets/triangle.png";
+  mark.alt = "";
+  stage.appendChild(mark);
   scale();
   window.addEventListener("resize", scale);
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(function () {

@@ -12,6 +12,8 @@
    - Remove an item:   delete its whole line.
    - Leave a price cell empty:  use ""  (it shows as a blank space).
    - A price with a small label in front:  { l: "Only", p: "3.99" }
+   - extras: [["Make it a Meal", "+2.50"]]  = add-on tags under a section
+   - info: ["..."]  = a short line of information under a section
 
    Each item is:  ["Name", price, price, ...]
    In sections with column headings (head), the prices line up
@@ -70,7 +72,7 @@ window.MENU = {
         ["Asian Style Calzone", "", "7.49", "9.99", "12.49"],
         ["Calzone Pizza", "", "7.99", "10.99", "13.99"]
       ],
-      note: "Make it a meal +2.50"
+      extras: [["Make it a Meal", "+2.50"]]
     },
 
     garlic: {
@@ -83,28 +85,29 @@ window.MENU = {
         ["Garlic Bread with Cheese, Garlic Butter and Mushroom", "4.49", "5.59", "6.59", "9.99"],
         ["Garlic Bread with Cheese, Tomato and Garlic Butter", "4.49", "5.99", "6.99", "11.99"]
       ],
-      note: "Make it a meal +2.50"
+      extras: [["Make it a Meal", "+2.50"]]
     },
 
     burgers: {
       title: "Burgers",
+      head: ["", "Double", "Triple"],
       items: [
-        ["Beef Burger", "3.59"],
-        ["Cheese Burger", "3.69"],
-        ["Hot Mexican Burger", "3.79"],
-        ["Hawaiian Burger", "3.69"],
-        ["Grilled Chicken Burger", "4.29"],
-        ["Peri Burger", "4.30"],
-        ["Chicken Fillet Burger", "3.89"],
-        ["Sizzler Burger", "3.99"],
-        ["Chicken Burger", "3.59"],
-        ["Mega Burger", "4.49"],
-        ["Egg Burger", "4.49"],
-        ["Vegetarian Burger", "3.59"],
-        ["Fish Burger", "3.49"],
-        ["Donner Burger", "3.59"]
+        ["Beef Burger", "3.59", "+2.00", "+3.50"],
+        ["Cheese Burger", "3.69", "+2.00", "+3.50"],
+        ["Hot Mexican Burger", "3.79", "+2.00", "+3.50"],
+        ["Hawaiian Burger", "3.69", "+2.00", "+3.50"],
+        ["Grilled Chicken Burger", "4.29", "+2.00", ""],
+        ["Peri Burger", "4.30", "+2.00", ""],
+        ["Chicken Fillet Burger", "3.89", "+2.00", ""],
+        ["Sizzler Burger", "3.99", "+2.00", ""],
+        ["Chicken Burger", "3.59", "+2.00", ""],
+        ["Mega Burger", "4.49", "+2.00", ""],
+        ["Egg Burger", "4.49", "+2.00", "+3.50"],
+        ["Vegetarian Burger", "3.59", "+2.00", ""],
+        ["Fish Burger", "3.49", "+2.00", ""],
+        ["Donner Burger", "3.59", "", ""]
       ],
-      note: "Make it a meal +2.50, all burgers +2.00 for double apart from Donner burger no double option, +3.50 for triple only beef burger, cheese burger, hot Mexican burger, Hawaiian burger, and egg burger"
+      extras: [["Make it a Meal", "+2.50"]]
     },
 
     steak: {
@@ -121,27 +124,26 @@ window.MENU = {
         ["Mix Grill", "7.99", "9.98"],
         ["Lamb Chops Meal", "9.99", "12.99"]
       ],
-      note: "All items under steak house can come on either chips, naan, rice, spiral fries, or potato wedges. Extra charges may apply"
+      info: ["Served on chips, naan, rice, spiral fries or potato wedges", "Extra charges may apply"]
     },
 
     kebabs: {
       title: "Kebabs",
-      group: [["Naan", 2], ["Pitta", 2]],
-      head: ["Reg", "Lrg", "Reg", "Lrg"],
+      group: [["Naan", 2], ["Pitta", 2], ["", 1]],
+      head: ["Reg", "Lrg", "Reg", "Lrg", "Meal"],
       items: [
-        ["Shish Kebab", "9.99", "11.99", "7.99", "9.99"],
-        ["Mixed Shish Kebab", "9.99", "11.99", "7.99", "9.99"],
-        ["Shish and Donner Kebab", "9.99", "11.99", "7.99", "9.99"],
-        ["Peri Chicken Kebab", "7.50", "9.49", "", ""],
-        ["Chicken Kebab", "6.99", "8.48", "6.49", "8.28"],
-        ["Donner Kebab", "6.49", "7.98", "5.99", "6.49"],
-        ["Mix Kebab", "7.49", "8.98", "6.99", "8.98"],
-        { head: ["", "", "Reg", "Lrg"] },
-        ["Kebab Roll", "", "", "3.99", "5.98"],
-        ["Donner Meat on Chips", "", "", "5.69", "7.68"],
-        ["Donner Wrap", "", "", "", "2.99"]
-      ],
-      note: "Make it a meal +2.50 all items under kebabs apart from Donner meat chips no option for meal"
+        ["Shish Kebab", "9.99", "11.99", "7.99", "9.99", "+2.50"],
+        ["Mixed Shish Kebab", "9.99", "11.99", "7.99", "9.99", "+2.50"],
+        ["Shish and Donner Kebab", "9.99", "11.99", "7.99", "9.99", "+2.50"],
+        ["Peri Chicken Kebab", "7.50", "9.49", "", "", "+2.50"],
+        ["Chicken Kebab", "6.99", "8.48", "6.49", "8.28", "+2.50"],
+        ["Donner Kebab", "6.49", "7.98", "5.99", "6.49", "+2.50"],
+        ["Mix Kebab", "7.49", "8.98", "6.99", "8.98", "+2.50"],
+        { head: ["", "", "Reg", "Lrg", "Meal"] },
+        ["Kebab Roll", "", "", "3.99", "5.98", "+2.50"],
+        ["Donner Meat on Chips", "", "", "5.69", "7.68", ""],
+        ["Donner Wrap", "", "", "", "2.99", "+2.50"]
+      ]
     },
 
     chicken: {
@@ -230,7 +232,7 @@ window.MENU = {
         ["Jam and Coconut Pudding", "5.49"],
         ["Classic Tiramisu", "4.99"]
       ],
-      note: "All items under cakes +1.00 for ice cream, +1.99 for custard"
+      extras: [["Add Ice Cream", "+1.00"], ["Add Custard", "+1.99"]]
     },
 
     milkshakes: {
@@ -326,20 +328,19 @@ window.MENU = {
      { left: [...], right: [...] } = two columns side by side
        (read the left column top to bottom, then the right).
        widths: "46fr 54fr" makes one column wider than the other.
-     "logo" = the small logo.
   ------------------------------------------------ */
   screens: {
     1: [
-      { left: ["starters"], right: ["logo"], widths: "60fr 40fr" },
+      "starters",
       "pizzas",
       "garlic"
     ],
     2: [
-      { left: ["burgers", "steak"], right: ["logo", "kebabs", "chicken"], widths: "45fr 55fr" },
+      { left: ["burgers", "steak"], right: ["kebabs", "chicken"], widths: "44fr 56fr" },
       "sides"
     ],
     3: [
-      { left: ["sauces", "cakes", "milkshakes"], right: ["logo", "cookie", "icecream", "slushes", "drinks"] }
+      { left: ["sauces", "cakes", "milkshakes"], right: ["cookie", "icecream", "slushes", "drinks"] }
     ]
   }
 };
