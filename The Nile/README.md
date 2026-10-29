@@ -13,7 +13,7 @@ Everything runs from these files – no internet, no login and no Claude account
 
 ## Showing a screen on a TV
 
-1. Copy the whole `menu-board` folder onto the computer / stick PC connected to the TV
+1. Copy the whole `The Nile` folder onto the computer / stick PC connected to the TV
    (or open it from GitHub Pages – see below).
 2. Set the TV / computer display to portrait (rotated) in the display settings.
 3. Open the screen in Google Chrome and press **F11** for full screen.
@@ -22,12 +22,12 @@ Everything runs from these files – no internet, no login and no Claude account
 
 Windows (one shortcut per TV):
 ```
-"C:\Program Files\Google\Chrome\Application\chrome.exe" --kiosk --noerrdialogs --disable-session-crashed-bubble "C:\menu-board\screen1.html"
+"C:\Program Files\Google\Chrome\Application\chrome.exe" --kiosk --noerrdialogs --disable-session-crashed-bubble "C:\The Nile\screen1.html"
 ```
 
 Raspberry Pi / Linux:
 ```
-chromium-browser --kiosk --noerrdialogs --disable-session-crashed-bubble file:///home/pi/menu-board/screen1.html
+chromium-browser --kiosk --noerrdialogs --disable-session-crashed-bubble "file:///home/pi/The Nile/screen1.html"
 ```
 
 Put the shortcut in the Startup folder so the menu comes back by itself after a power cut.
@@ -76,7 +76,19 @@ Which sections go on which screen is at the bottom of `menu-data.js` (`screens:`
 - `assets/logo.png` – the full logo cut-out (used only on the start page)
 - `fonts/` – fonts stored locally so no internet is needed
 
-## Hosting on GitHub Pages (optional)
+## Network screens (screen's own browser) – GitHub Pages
 
-In the GitHub repository: Settings → Pages → deploy from branch. The screens will then be at
-`https://<your-username>.github.io/<repo>/menu-board/screen1.html`.
+1. Repository Settings → General → Danger Zone → make the repository **public**
+   (free GitHub Pages needs a public repository).
+2. Settings → Pages → Source: **Deploy from a branch** → pick the branch that has this folder
+   (e.g. `main`) and **/ (root)** → Save. Wait 1–2 minutes.
+3. Enter one address in each screen's browser and set it as the start page:
+   - Screen 1: `https://hkhan-206.github.io/Projects/The%20Nile/screen1.html`
+   - Screen 2: `https://hkhan-206.github.io/Projects/The%20Nile/screen2.html`
+   - Screen 3: `https://hkhan-206.github.io/Projects/The%20Nile/screen3.html`
+
+   (`%20` is how a web address writes the space in "The Nile".)
+4. Use the screen's own portrait setting, or add `?rotate=90` to the address.
+
+Edits to `menu-data.js` on GitHub show on the screens within about an hour.
+If the internet drops, the screen keeps the menu up and retries every 5 minutes.
