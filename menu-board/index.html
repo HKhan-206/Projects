@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Nile – Menu Screens</title>
+<style>
+  body { margin: 0; min-height: 100vh; background: #120c0a; color: #fff; font: 18px/1.5 system-ui, sans-serif; display: grid; place-items: center; }
+  main { padding: 32px 16px; max-width: 760px; width: 100%; box-sizing: border-box; }
+  img { width: 320px; max-width: 100%; display: block; margin-bottom: 24px; }
+  .links { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0 28px; }
+  a.btn { background: #EE6E4E; color: #120c0a; text-decoration: none; font-weight: 700; padding: 14px 22px; border-radius: 10px; }
+  code { background: #2a1d18; padding: 2px 6px; border-radius: 4px; }
+  li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<main>
+  <img src="assets/logo.png" alt="The Nile">
+  <h1>Menu screens</h1>
+  <p>Open each screen on its TV, then press <b>F11</b> for full screen.</p>
+  <div class="links">
+    <a class="btn" href="screen1.html">Screen 1 – Starters, Pizzas, Garlic Breads</a>
+    <a class="btn" href="screen2.html">Screen 2 – Burgers, Steak House, Kebabs, Chicken, Sides</a>
+    <a class="btn" href="screen3.html">Screen 3 – Sauces, Cakes, Desserts, Drinks</a>
+  </div>
+  <ul>
+    <li>To change names or prices, edit <code>menu-data.js</code>. See <code>README.md</code>.</li>
+    <li>If the TV is turned on its side but the computer outputs landscape, add <code>?rotate=90</code> (or <code>?rotate=270</code>) to the address, e.g. <code>screen1.html?rotate=90</code>.</li>
+  </ul>
+</main>
+</body>
+</html>

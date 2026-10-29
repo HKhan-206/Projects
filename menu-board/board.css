@@ -1,0 +1,189 @@
+/* The Nile – menu board styles. Each screen is 1080 x 1920 (portrait). */
+
+@font-face { font-family: "Montserrat"; font-weight: 700; src: url(fonts/montserrat-latin-700-normal.woff2) format("woff2"); }
+@font-face { font-family: "Montserrat"; font-weight: 800; src: url(fonts/montserrat-latin-800-normal.woff2) format("woff2"); }
+@font-face { font-family: "Barlow Semi Condensed"; font-weight: 500; src: url(fonts/barlow-semi-condensed-latin-500-normal.woff2) format("woff2"); }
+@font-face { font-family: "Barlow Semi Condensed"; font-weight: 600; src: url(fonts/barlow-semi-condensed-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 600; src: url(fonts/barlow-condensed-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 700; src: url(fonts/barlow-condensed-latin-700-normal.woff2) format("woff2"); }
+
+:root {
+  --brand: #EE6E4E;          /* orange from the logo */
+  --panel: rgba(12, 9, 8, 0.87);
+  --text: #FFFFFF;
+  --muted: #FFD8C6;
+  --rule: rgba(255, 255, 255, 0.10);
+  --fs: 28px;                /* base text size – set automatically by board.js */
+  --safe: 44px;              /* safe margin from the screen edge */
+  --gap: 18px;               /* space between panels */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #000;
+  cursor: none;
+}
+
+/* Fixed 1080x1920 stage, scaled to fit whatever screen it is shown on */
+#stage {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 1080px; height: 1920px;
+  transform-origin: center center;
+  /* Supplied background, shown at its original size and colours.
+     It is 970px wide, so it repeats sideways to cover the 1080px width. */
+  background-color: #EB5A0C;
+  background-image: url(assets/background.jpg);
+  background-repeat: repeat-x;
+  background-position: center center;
+  background-size: auto;
+  overflow: hidden;
+}
+
+#board {
+  position: absolute;
+  inset: var(--safe);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  font-size: var(--fs);
+}
+
+.block { flex: 1 0 auto; display: flex; }
+.block > .panel { flex: 1; }
+
+.split {
+  flex: 1 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+}
+.col { display: flex; flex-direction: column; gap: var(--gap); min-width: 0; }
+.col > .panel:last-child { flex: 1 0 auto; }
+
+/* Dark panel with a thin orange inner frame, echoing the logo artwork */
+.panel {
+  position: relative;
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 0.62em 0.8em 0.55em;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.panel::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 2px solid var(--brand);
+  border-radius: 11px;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.title {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 800;
+  font-size: 1.12em;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brand);
+  line-height: 1.1;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-bottom: 0.18em;
+}
+.title::after {
+  content: "";
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, var(--brand), rgba(238,110,78,0));
+}
+
+/* Item table: name column + one column per price */
+.items {
+  display: grid;
+  align-content: space-evenly;
+  flex: 1;
+  line-height: 1.12;
+}
+
+.name, .price, .head, .group, .blank {
+  padding: 0.17em 0;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+}
+.name {
+  font-family: "Barlow Semi Condensed", sans-serif;
+  font-weight: 600;
+  color: var(--text);
+  padding-right: 0.4em;
+}
+.price {
+  justify-content: flex-end;
+  gap: 0.2em;
+  padding-left: 0.5em;
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  font-size: 1.1em;
+  color: var(--text);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.price .lbl, .head, .group {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  font-size: 0.5em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+.price .lbl { font-size: 0.47em; }
+.head, .group {
+  justify-content: flex-end;
+  padding-left: 1.1em;
+  font-size: 0.56em;
+  border-bottom-color: transparent;
+  white-space: nowrap;
+}
+.group {
+  justify-content: center;
+  color: var(--muted);
+  padding-left: 1.1em;
+  padding-bottom: 0;
+}
+.group span {
+  width: 100%;
+  text-align: center;
+  border-bottom: 1px solid rgba(238,110,78,0.6);
+  padding-bottom: 0.1em;
+}
+.items > .last { border-bottom-color: transparent; }
+
+.note {
+  margin-top: 0.3em;
+  font-family: "Barlow Semi Condensed", sans-serif;
+  font-weight: 500;
+  font-size: 0.8em;
+  line-height: 1.18;
+  color: var(--muted);
+}
+.note::before { content: "★ "; color: var(--brand); }
+
+/* Logo panel */
+.logo-panel {
+  align-items: center;
+  justify-content: center;
+  padding: 0.9em 0.9em;
+}
+.logo-panel img { width: 340px; max-width: 88%; height: auto; display: block; }
+
+.single-items { flex: 1; display: flex; flex-direction: column; }
+.single-items > .items { flex: 1; }
+.split-items { flex: 1; display: grid; grid-template-columns: 1fr 1fr; column-gap: 1.3em; }
+.items > .cont { border-bottom-color: transparent; padding-bottom: 0; }
