@@ -1,6 +1,6 @@
 /* The Nile – promo screen v2 (1080 x 1920 portrait) */
 
-@font-face { font-family: "Marker"; src: url(fonts/permanent-marker-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "Brush"; src: url(fonts/knewave-latin-400-normal.woff2) format("woff2"); }
 @font-face { font-family: "Montserrat"; font-weight: 900; src: url(../fonts/montserrat-latin-900-normal.woff2) format("woff2"); }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -13,7 +13,6 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000; curs
   background: #fc8f05;
   transform-origin: center center;
 }
-
 .scene { position: absolute; inset: 0; visibility: hidden; overflow: hidden; }
 
 /* full-screen background matched to the photo's own left edge */
@@ -21,53 +20,39 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000; curs
 
 /* the complete photograph (with its extended backdrop) – moves as one layer */
 .photo {
-  position: absolute;
-  left: -160px; top: -150px;
+  position: absolute; top: -150px;
   will-change: transform;
-  transform-origin: 50% 47%;
-  /* soft left edge – the only edge that ever crosses the screen */
+  transform-origin: 50% 52%;
   -webkit-mask-image: linear-gradient(to right, transparent 0, #000 140px);
           mask-image: linear-gradient(to right, transparent 0, #000 140px);
 }
 .photo img { display: block; width: 100%; height: 100%; }
 
-/* item name */
-.name {
-  position: absolute; left: 0; right: 0; top: 250px;
-  text-align: center;
-  color: #ffffff;
-  white-space: nowrap;
-  line-height: 1;
-}
-.name .row { display: block; }
-.name .ch { display: inline-block; will-change: transform; }
-.name.write {
-  font-family: "Marker", cursive;
-  font-size: 128px;
-  letter-spacing: 0.01em;
-  transform: rotate(-4deg);
-}
-.name.build {
-  font-family: "Montserrat", sans-serif;
-  font-weight: 900;
-  font-size: 170px;
-  letter-spacing: -0.01em;
-  line-height: 0.95;
-}
-.name .ch {
-  -webkit-text-stroke: 12px #3a1300;
-  paint-order: stroke fill;
-  text-shadow: 0 12px 0 rgba(88, 26, 0, 0.55);
-}
+/* drawn brush graphics (blobs, scribbles, action lines, arrow, panels) */
+.gfx { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: visible; pointer-events: none; }
 
-/* small logo badge, bottom right */
-.logo {
-  position: absolute; right: 44px; bottom: 50px;
-  width: 250px; padding: 14px 22px;
-  background: #0d0d0d; border-radius: 20px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+/* big brush title */
+.title {
+  position: absolute; left: 60px; top: 250px;
+  transform: rotate(-6deg); transform-origin: 0 50%;
+  filter: url(#brushTex);
 }
-.logo img { display: block; width: 100%; height: auto; }
+.title .line { display: block; white-space: nowrap; font-family: "Brush", sans-serif; line-height: 0.92; }
+.title .ch { display: inline-block; will-change: transform; -webkit-text-stroke: 9px #2a1206; paint-order: stroke fill; }
+.title .white .ch { color: #fffaf2; }
+.title .yellow .ch { color: #ffc31a; }
+
+/* small tagline on its own brush panel */
+.tag { position: absolute; left: 70px; top: 1700px; transform: rotate(-5deg); transform-origin: 0 50%; }
+.tag .t { position: relative; font-family: "Montserrat", sans-serif; font-weight: 900; font-size: 54px; line-height: 1.06; white-space: nowrap; }
+.tag .t1 { color: #ffffff; }
+.tag .t2 { color: #ffc31a; }
+.tag .flame { position: absolute; left: -12px; top: 18px; width: 70px; height: 84px; }
+.tag .txt { padding-left: 82px; position: relative; }
+
+/* flying veg */
+.veg { position: absolute; left: 0; top: 0; will-change: transform; }
+.veg img { display: block; width: 100%; height: auto; }
 
 /* flash between items */
 .flash { position: absolute; inset: 0; background: #fff3e2; opacity: 0; pointer-events: none; z-index: 20; }
