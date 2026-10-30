@@ -13,7 +13,7 @@
 
    SLOGAN SLIDES (type: "slogan") – words only, animated. Each "beat" is one
    screen of words:
-     bg    = "dark", "orange", "cream" or a colour code
+     bg    = "dark" (plain black), "orange", "cream" or a colour code
      lines = t (text), size, colour, style ("outline" / "box"),
              in (slam, fromLeft, fromRight, stretch, zoom, flip, wipe, spin, rise, drop, type),
              at (seconds after the beat starts)
@@ -88,8 +88,8 @@ window.PROMO2 = {
         { bg: "orange", hold: 1.1, out: "zoom", lines: [
           { t: "IS OUR", size: 220, colour: "black", in: "fromRight" },
           { t: "RECIPE.", size: 250, colour: "white", in: "slam", at: 0.4, shake: 1.3 } ] },
-        { bg: "cream", logo: "center", hold: 1.6, out: "none", lines: [
-          { t: "QUALITY IS OUR RECIPE", size: 64, colour: "black", in: "type", at: 0.6 } ] }
+        { bg: "dark", logo: "center", hold: 1.6, out: "none", lines: [
+          { t: "QUALITY IS OUR RECIPE", size: 64, colour: "white", in: "type", at: 0.6 } ] }
       ]
     },
     {
@@ -166,7 +166,7 @@ window.PROMO2 = {
           { t: "ESPECIALLY", size: 190, colour: "white", in: "stretch" },
           { t: "WHEN IT’S", size: 190, colour: "white", in: "fromRight", at: 0.35 },
           { t: "FROM", size: 250, colour: "orange", in: "fromLeft", at: 0.55 } ] },
-        { bg: "orange", logo: "center", hold: 2.2, out: "none", lines: [] }
+        { bg: "dark", logo: "center", hold: 2.2, out: "none", lines: [] }
       ]
     },
     {

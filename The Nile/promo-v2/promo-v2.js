@@ -333,7 +333,7 @@
   /* =====================================================================
      SLOGAN SLIDES – words only (from the original promo, new orange)
      ===================================================================== */
-  var COLOURS = { white: "#ffffff", black: "#111111", orange: ORANGE, cream: "#F7F3EE", dark: "#0E0E0E" };
+  var COLOURS = { white: "#ffffff", black: "#111111", orange: ORANGE, cream: "#F7F3EE", dark: "#000000" };   // dark = plain black, matches the logo
   function col(c) { return COLOURS[c] || c || "#ffffff"; }
   function lum(hex) { var c = rgb(hex); return c[0] * 0.299 + c[1] * 0.587 + c[2] * 0.114; }
 
