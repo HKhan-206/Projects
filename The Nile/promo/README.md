@@ -68,51 +68,60 @@ then change it:
 
 ```js
 {
-  id: "kebab",                 // short name, no spaces
+  id: "donner-kebab",          // short name, no spaces
   enabled: true,               // false = hidden
   animation: "sweep",          // sweep | slam | rise | spin | drop
-  duration: 12,                // seconds on screen
+  duration: 10.5,              // seconds on screen (each run)
   background: "#EE6A2E",       // orange for this promotion
-  image: "images/kebab.png",
+  image: "images/donner-kebab.png",
   imageWidth: 950,
   bigWord: "KEBAB",            // giant word behind the food
   headline: ["BIG. BOLD.", "LOADED."],
-  title: "DONNER KEBAB MEAL",
-  details: "Naan or pitta",
-  priceLabel: "MEAL",
-  price: "7.49"
+  title: "DONNER KEBAB",       // just the item name
+  price: "6.49",               // item price
+  mealPrice: "8.99"            // optional: plays again with "MAKE IT A MEAL" and this price
 },
 ```
 
 The order on screen is the order in this list.
 
+**Item price, then meal price:** when a promotion has `mealPrice`, it plays twice:
+first with the item price, then the same animation again with **MAKE IT A MEAL**
+and the meal price. Leave `mealPrice` out to play it once.
+
+**A message instead of a price** (used for the pizza):
+`deal: ["ENJOY EXCLUSIVE DEALS ON", "2 x 12”", "PIZZAS"]` shows a small top line,
+a big middle line and a bottom line. Leave out `price` and `mealPrice`.
+
 **Animation styles:**
-- `sweep`: giant word sweeps across, food slides in from the side.
+- `sweep`: giant word sweeps across, food slides in from the side. Add `from: "left"` to come from the left.
 - `slam`: words slam onto the screen one at a time (`slamWords: ["BRING", "THE", "HEAT."]`), food zooms in.
-- `rise`: letters and food rise from the bottom. Add `anchorBottom: true` for tall items like wraps.
+- `rise`: letters and food rise up from the bottom of the screen.
 - `spin`: giant word sweeps, food rolls in spinning. Best for flat items like pizza (add `shadow: "round"`).
 - `drop`: letters and food drop in from the top.
+
+Every word is automatically sized to fit inside the screen.
 
 ---
 
 ## 4. Changing prices and text
 
 Edit the text in quotes in `promos.js` and save:
-- `price: "5.99"` is the big price (the £ sign is added for you).
-- `priceLabel: "MEAL"` is the small word above the price (e.g. `FROM`, `MEAL`, `ONLY`).
-- `headline`, `title` and `details` are the words.
+- `price: "4.30"` is the big price (the £ sign is added for you).
+- `mealPrice: "6.80"` is the price shown on the "MAKE IT A MEAL" run.
+- `priceLabel: "FROM"` is an optional small word above the price.
+- `headline`, `title` and `details` are the words (`details` is optional).
 - A title can go over two lines with `\n`, e.g. `"CHICKEN TIKKA\nSPECIAL PIZZA"`.
 
-Long words shrink automatically to fit the screen.
-
-> **Before going live:** the two burger promos have the placeholder price `X.XX` and
-> placeholder names ("BURGER MEAL" / "CHICKEN BURGER MEAL"). Put in your real offer.
+Item prices are the menu prices. Burger meal prices are the menu price + 2.50
+("Make it a meal +2.50" on the menu). Wrap meal prices are from the menu.
 
 ---
 
 ## 5. Adjusting the timing
 
-- `duration` sets how long each promotion stays on screen (10–14 seconds works well).
+- `duration` sets how long each run stays on screen (10–14 seconds works well).
+  Items with a meal price play twice, so they take twice as long.
   The animations play in the first 6–8 seconds and the final layout holds for the rest.
 - `animation` swaps to a different motion style.
 - For finer control, the timings are the numbers (in seconds) inside each style in `promo.js`.
