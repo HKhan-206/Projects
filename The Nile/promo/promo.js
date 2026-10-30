@@ -125,9 +125,8 @@
   }
 
   /* ---------- building blocks ---------- */
-  // layout positions; the "studio" look puts the words at the top and the food on the pedestal
+  // layout positions
   function lay(p) {
-    if (p.look === "studio") return { headlineY: 240, titleY: 530, detailsY: 610, priceY: 625 };
     var a = slots(p);
     a.headlineY = L.headlineY;
     return a;
@@ -141,19 +140,6 @@
       sc.dark = true;
       sc.root.classList.add("on-dark");
       sc.bg.style.background = "radial-gradient(110% 70% at 50% 48%, #2a2a2a 0%, #161616 55%, #0b0b0b 100%)";
-    } else if (sc.look === "studio") {
-      sc.dark = true;                       // light words over the darker studio wall
-      sc.studio = true;
-      sc.bg.style.background = "#7a3c0c";
-      var src = p.backdrop || "images/backdrop-studio.jpg";
-      var bd = el("img", "backdrop", sc.bg);
-      bd.src = src;
-      var bi = images[src];
-      // cover the screen (the .bg layer reaches 60px past each edge)
-      var k = bi && bi.naturalHeight ? Math.max((W + 120) / bi.naturalWidth, (H + 120) / bi.naturalHeight) : 1.43;
-      var bw = bi ? bi.naturalWidth * k : 1320, bh = bi ? bi.naturalHeight * k : 1980;
-      Object.assign(bd.style, { width: bw + "px", height: bh + "px", left: ((W + 120 - bw) / 2) + "px", top: ((H + 120 - bh) / 2) + "px" });
-      sc.backdrop = bd;
     } else {
       sc.bg.style.background = "radial-gradient(120% 78% at 50% 46%, " + mix(sc.base, "#ffffff", 0.14) + " 0%, " +
         sc.base + " 50%, " + mix(sc.base, "#000000", 0.24) + " 100%)";
@@ -445,7 +431,6 @@
   styles.zoom = function (sc, p) {
     var tl = gsap.timeline(), P = parts(sc, p);
     hideAll(tl, sc, P);
-    if (sc.backdrop) tl.fromTo(sc.backdrop, { scale: 1.25 }, { scale: 1, duration: 1.6, ease: "power3.out" }, 0);
     var f = intro(tl, sc, 0.25);
     tl.fromTo(sc.foodWrap, { autoAlpha: 0, scale: 2.2, y: -120 }, { autoAlpha: 1, scale: 1, y: 0, duration: 1.2, ease: "expo.out" }, f);
     blur(tl, sc.foodWrap, 20, 0.5, f, "xy");
@@ -688,8 +673,7 @@
   var fonts = ["900 100px Montserrat", "800 100px Montserrat", "600 40px 'Barlow Semi Condensed'"].map(function (f) {
     return document.fonts ? document.fonts.load(f) : Promise.resolve();
   });
-  var loads = promos.filter(function (p) { return p.image; }).map(function (p) { return loadImage(p.image); })
-    .concat(promos.filter(function (p) { return p.look === "studio"; }).map(function (p) { return loadImage(p.backdrop || "images/backdrop-studio.jpg"); })).concat([loadImage(S.logo)], fonts);
+  var loads = promos.filter(function (p) { return p.image; }).map(function (p) { return loadImage(p.image); }).concat([loadImage(S.logo)], fonts);
 
   Promise.all(loads).then(function () { return document.fonts ? document.fonts.ready : null; }).then(start);
 

@@ -76,7 +76,7 @@ then change it:
   background: "#EE6A2E",       // orange for this promotion
   image: "images/donner-kebab.png",
   imageWidth: 950,
-  look: "band",                // optional: "band" (diagonal band) or "studio" (pedestal backdrop)
+  look: "band",                // optional: dark background with a thick diagonal orange band
   headline: ["BIG. BOLD.", "LOADED."],
   title: "DONNER KEBAB",       // just the item name
   price: "6.49",               // item price
@@ -105,9 +105,8 @@ The options are explained at the top of `promos.js`. Copy an existing slogan blo
 - `drop`: food drops in from the top and bounces.
 - `zoom`: the camera pulls back onto the food.
 
-**Looks:** `look: "band"` gives a dark background with a diagonal orange band sliding in behind
-the food. `look: "studio"` puts the burger on the studio pedestal backdrop
-(`imageX` / `imageBottom` position it on the pedestal). Leave `look` out for plain orange.
+**Looks:** `look: "band"` gives a dark background with a thick diagonal orange band sliding in;
+the food sits fully on the orange band. Leave `look` out for plain orange.
 
 Every word is automatically sized to fit inside the screen.
 

@@ -7,9 +7,8 @@
 
    ORDER      = the order the promotions appear in this list.
    enabled    = false hides a promotion without deleting it.
-   look       = "orange" (default), "band" (dark background, diagonal orange band
-                slides in behind the food) or "studio" (burger on the studio pedestal;
-                imageX / imageBottom place it on the pedestal).
+   look       = "orange" (default) or "band" (dark background, a thick diagonal
+                orange band slides in and the food sits on it).
    animation  = which motion style to use:
                 "sweep"  food slides in from the side (from: "left" to reverse)
                 "slam"   slamWords slam on one at a time and clear, then the food zooms in
@@ -109,11 +108,9 @@ window.PROMO_CONFIG = {
     {
       id: "peri-burger",
       animation: "drop",
-      look: "studio",                        // burger on the studio pedestal
-      imageX: 545, imageBottom: 1545,
       background: "#EC632B",
       image: "images/peri-burger.png",
-      imageWidth: 800,
+      imageWidth: 960,
       headline: ["FEEL", "THE HEAT."],
       title: "PERI BURGER",
       price: "4.30",
@@ -199,12 +196,11 @@ window.PROMO_CONFIG = {
     },
     {
       id: "egg-burger",
-      animation: "zoom",
-      look: "studio",
-      imageX: 545, imageBottom: 1545,
+      animation: "sweep",
+      look: "band",
       background: "#EC632B",
       image: "images/egg-burger.png",
-      imageWidth: 800,
+      imageWidth: 920,
       headline: ["THE ULTIMATE", "BURGER."],
       title: "EGG BURGER",
       price: "4.49",

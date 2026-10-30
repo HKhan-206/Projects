@@ -202,14 +202,11 @@ html, body {
 }
 .logo-center { top: auto; width: 760px; margin-left: -380px; padding: 34px 58px; border-radius: 44px; }
 
-/* studio backdrop */
-.backdrop { position: absolute; display: block; will-change: transform; transform-origin: 50% 70%; }
-
 /* diagonal motion band behind the food */
 .dband-wrap { position: absolute; left: 540px; width: 0; height: 0; transform: rotate(-31deg); }
-.dband { position: absolute; left: -2300px; width: 4600px; top: -260px; height: 520px; will-change: transform; }
-.dband.thin { top: 290px; height: 30px; }
-.dband.thin2 { top: -318px; height: 14px; }
+.dband { position: absolute; left: -2300px; width: 4600px; top: -620px; height: 1240px; will-change: transform; }   /* thick enough to hold the whole food item */
+.dband.thin { top: 650px; height: 30px; }
+.dband.thin2 { top: -662px; height: 14px; }
 
 /* words on the dark looks */
 .on-dark .title { color: #ffffff; }
