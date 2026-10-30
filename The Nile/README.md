@@ -8,6 +8,7 @@ Everything runs from these files – no internet, no login and no Claude account
 | 1 | `screen1.html` | Starters, Pizzas, Garlic Breads |
 | 2 | `screen2.html` | Burgers, The Steak House, Kebabs, Chicken, Side Orders |
 | 3 | `screen3.html` | Sauces, Cakes, Milkshakes, Cookie Doughs, Ice Creams, Slushes, Drinks |
+| Promo | `promo/index.html` | Animated food adverts – see `promo/README.md` |
 
 `index.html` is a start page with a button for each screen.
 
