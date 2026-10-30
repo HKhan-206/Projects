@@ -17,6 +17,7 @@ window.PROMO2 = {
     {
       id: "grilled-chicken-burger",
       image: "images/grilled-chicken-burger.jpg",
+      front: { src: "images/grilled-chicken-burger-front.png", x: 318, y: 1578, w: 1389, h: 847 },   // burger-only top layer (same pixels as the photo)
       layerW: 2000, layerH: 3193,
       title: [["GRILLED", "white"], ["CHICKEN", "white"], ["BURGER", "yellow"]],
       tagline: ["FRESHLY GRILLED", "FULL OF FLAVOUR"],
@@ -26,6 +27,7 @@ window.PROMO2 = {
     {
       id: "peri-burger",
       image: "images/peri-burger.jpg",
+      front: { src: "images/peri-burger-front.png", x: 393, y: 1631, w: 1386, h: 775 },   // burger-only top layer (same pixels as the photo)
       layerW: 2000, layerH: 3193,
       title: [["PERI", "white"], ["BURGER", "yellow"]],
       tagline: ["BRING THE HEAT", "TURN UP THE FLAVOUR"],
@@ -35,6 +37,7 @@ window.PROMO2 = {
     {
       id: "chicken-fillet-burger",
       image: "images/chicken-fillet-burger.jpg",
+      front: { src: "images/chicken-fillet-burger-front.png", x: 356, y: 1566, w: 1309, h: 858 },   // burger-only top layer (same pixels as the photo)
       layerW: 2000, layerH: 3194,
       title: [["CHICKEN", "white"], ["FILLET", "white"], ["BURGER", "yellow"]],
       tagline: ["CRISPY & GOLDEN", "BUILT TO SATISFY"],

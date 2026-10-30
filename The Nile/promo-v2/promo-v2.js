@@ -108,6 +108,40 @@
     tl.fromTo(path, { strokeDashoffset: len, autoAlpha: 1 }, { strokeDashoffset: 0, duration: dur, ease: "power2.out" }, at);
   }
 
+  /* ---------- mayo splash (drawn; sweeps in from the left behind the burger) ---------- */
+  function buildMayo(parent, R) {
+    var svg = svgLayer(parent);
+    var g = sv("g", { "class": "mayo" }, svg);
+    var id = "mayoG" + (fx++), cl = "mayoC" + (fx++), sh = "mayoS" + (fx++);
+    var d = sv("defs", {}, svg);
+    d.innerHTML =
+      '<linearGradient id="' + id + '" x1="0" y1="0" x2="0.35" y2="1">' +
+        '<stop offset="0" stop-color="#fffef8"/><stop offset="0.55" stop-color="#fbf4e0"/><stop offset="1" stop-color="#eadcb4"/></linearGradient>' +
+      '<clipPath id="' + cl + '"><rect x="-80" y="700" width="0" height="900"/></clipPath>' +
+      '<filter id="' + sh + '" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#6a2300" flood-opacity="0.35"/></filter>';
+    var lift = sv("g", { transform: "translate(-20,-70) scale(1.08)" }, g);   // crest shows above the bun
+    var body = sv("g", { "clip-path": "url(#" + cl + ")", filter: "url(#" + sh + ")" }, lift);
+    // main ribbon: from the left edge, rising to a curling crest above the bun, with a drip hanging down
+    sv("path", { fill: "url(#" + id + ")", d:
+      "M-60,1175 C60,1080 160,1000 270,955 C360,918 450,905 520,930 C578,950 594,1002 562,1032 " +
+      "C540,1052 504,1042 494,1016 C480,985 440,986 400,1001 C300,1040 205,1118 128,1225 " +
+      "C108,1255 104,1318 108,1360 C111,1394 84,1399 80,1364 C76,1322 74,1292 52,1302 C22,1320 0,1340 -60,1362 Z" }, body);
+    // shading on the underside
+    sv("path", { fill: "none", stroke: "#dccb98", "stroke-width": 22, "stroke-linecap": "round", opacity: 0.55, d:
+      "M500,1020 C470,990 430,992 395,1008 C300,1048 210,1125 135,1230" }, body);
+    // glossy highlights
+    var hl = sv("g", { fill: "none", stroke: "#ffffff", "stroke-linecap": "round", filter: "url(#roughSoft)" }, body);
+    sv("path", { "stroke-width": 11, opacity: 0.95, d: "M-10,1170 C110,1070 240,985 360,948 C430,928 486,928 512,944" }, hl);
+    sv("path", { "stroke-width": 6, opacity: 0.8, d: "M96,1262 C92,1290 92,1318 95,1345" }, hl);
+    sv("ellipse", { cx: 468, cy: 940, rx: 18, ry: 7, fill: "#ffffff", stroke: "none", transform: "rotate(-12 468 940)" }, hl);
+    // droplets flung off the crest
+    var drops = [[600, 880, 13], [650, 930, 9], [560, 830, 10], [700, 870, 7], [470, 850, 8], [620, 990, 6]].map(function (p) {
+      var c = sv("ellipse", { cx: 0, cy: 0, rx: p[2], ry: p[2] * 1.15, fill: "url(#" + id + ")" }, g);
+      return { el: c, x: p[0], y: p[1] - 70 };
+    });
+    return { g: g, clipRect: d.querySelector("rect"), drops: drops };
+  }
+
   /* ---------- build one scene ---------- */
   var items = CFG.items.filter(function (it) { return !only || it.id === only; });
 
@@ -137,8 +171,14 @@
       sv("path", { d: scribble(905, 905, 120, 120, 6, R) }, gS)
     ];
 
-    // far veg (behind the lettering)
-    sc.vegFar = el("div", "", sc.root);
+    // flying veg and the mayo splash sit BEHIND the burger
+    sc.vegLayer = el("div", "", sc.root);
+    sc.mayo = buildMayo(sc.root, R);
+    // the burger again on top (same pixels as the photo), so the veg and mayo are hidden behind it
+    sc.photoFront = el("div", "photo-front", sc.root);
+    Object.assign(sc.photoFront.style, { width: lw + "px", height: lh + "px", left: ((W - lw) / 2) + "px" });
+    var img2 = el("img", null, sc.photoFront); img2.src = it.front.src; img2.alt = "";
+    Object.assign(img2.style, { position: "absolute", left: it.front.x * K + "px", top: it.front.y * K + "px", width: it.front.w * K + "px", height: it.front.h * K + "px" });
 
     // title on its dark brush panel
     var tw = el("div", "title-wrap", sc.root);
@@ -220,28 +260,26 @@
     sc.tagPanel.setAttribute("d", brushRect(8, 4, tagW, 146, R));
     sc.flame = flame;
 
-    // flying veg
-    sc.vegNear = el("div", "", sc.root);
+    // flying veg (all behind the burger, low on the screen)
     sc.veg = [];
     if (it.veg) {
       var V = [
-        // img, centre x, y, size, end rotation, depth
-        ["tomato",   1000, 1135, 220,  18, "mid"],
-        ["cucumber",  70, 1235, 290, -24, "near"],
-        ["tomato",   150,  975, 125, -30, "far"],
-        ["cucumber", 830,  930, 150,  35, "far"],
-        ["tomato",   1020, 1830, 330,  12, "near"],
-        ["cucumber", 120,  1690, 150, 50, "far"]
+        // image, centre x, y, width, end rotation
+        ["lettuce",    70, 1415, 300, -38],
+        ["lettuce",  1010, 1450, 280,  42],
+        ["tomato",    995, 1290, 230,  18],
+        ["cucumber",   85, 1255, 220, -20],
+        ["tomato",    150, 1585, 175, -30],
+        ["cucumber", 1010, 1660, 150,  40]
       ];
       V.forEach(function (v, i) {
-        var host = v[5] === "near" ? sc.vegNear : sc.vegFar;
-        var box = el("div", "veg", host);
+        var box = el("div", "veg", sc.vegLayer);
         box.style.width = v[3] + "px";
         box.style.left = (v[1] - v[3] / 2) + "px";
         box.style.top = (v[2] - v[3] / 2) + "px";
+        box.style.filter = "drop-shadow(0 14px 14px rgba(80,25,0,.30))";
         var im = el("img", null, box); im.src = "images/veg/" + v[0] + ".png"; im.alt = "";
-        box.style.filter = v[5] === "near" ? "blur(5px) drop-shadow(0 18px 18px rgba(80,25,0,.35))" : v[5] === "far" ? "blur(2.2px)" : "drop-shadow(0 14px 14px rgba(80,25,0,.35))";
-        sc.veg.push({ box: box, img: im, x: v[1], y: v[2], rot: v[4], depth: v[5], i: i });
+        sc.veg.push({ box: box, img: im, x: v[1], y: v[2], rot: v[4], i: i });
       });
     }
     return sc;
@@ -249,7 +287,7 @@
 
   /* ---------- animation ---------- */
   function photoIn(tl, sc, at) {       // the whole photograph slides in from the right
-    var p = sc.photo;
+    var p = [sc.photo, sc.photoFront];
     tl.set(p, { x: W + 260, scale: 1.14 }, 0);
     tl.to(p, { x: -34, duration: 0.95, ease: "expo.out" }, at);
     tl.to(p, { scale: 0.985, duration: 1.05, ease: "power3.out" }, at);
@@ -259,18 +297,36 @@
 
   function vegIn(tl, sc, at, holdEnd) {
     sc.veg.forEach(function (v, k) {
-      var dx = v.x - 540, dy = v.y - 1150, d = Math.hypot(dx, dy) || 1;
-      var sx = dx / d * 1100, sy = dy / d * 900 - 200;           // come in from off-screen, along the line from the burger
-      var t0 = at + k * 0.07;
+      // start hidden behind the burger, then burst outwards
+      var sx = (560 - v.x) * 0.9, sy = (1300 - v.y) * 0.9;
+      var t0 = at + k * 0.06;
       tl.set(v.box, { autoAlpha: 0 }, 0);
-      tl.fromTo(v.box, { autoAlpha: 1, x: sx, y: sy, rotation: v.rot - 220 * (k % 2 ? 1 : -1), scale: 0.7 },
-        { x: 0, y: 0, rotation: v.rot, scale: 1, duration: 1.05, ease: "expo.out" }, t0);
-      blur(tl, v.img, v.depth === "near" ? 26 : 18, 0.55, t0, "xy");
-      // gentle floating while the scene holds
-      var amp = v.depth === "near" ? 18 : v.depth === "far" ? 8 : 12, per = 1.5 + (k % 3) * 0.35;
-      var reps = Math.max(1, Math.floor((holdEnd - (t0 + 1.05)) / per) - 1);
-      tl.to(v.box, { y: (k % 2 ? -amp : amp), rotation: v.rot + (k % 2 ? 7 : -7), duration: per, ease: "sine.inOut", yoyo: true, repeat: reps }, t0 + 1.05);
+      tl.fromTo(v.box, { autoAlpha: 1, x: sx, y: sy, rotation: v.rot - 200 * (k % 2 ? 1 : -1), scale: 0.45 },
+        { x: 0, y: 0, rotation: v.rot, scale: 1, duration: 1.0, ease: "expo.out" }, t0);
+      blur(tl, v.img, 20, 0.5, t0, "xy");
+      var amp = 10 + (k % 3) * 3, per = 1.5 + (k % 3) * 0.35;
+      var reps = Math.max(1, Math.floor((holdEnd - (t0 + 1.0)) / per) - 1);
+      tl.to(v.box, { y: (k % 2 ? -amp : amp), rotation: v.rot + (k % 2 ? 6 : -6), duration: per, ease: "sine.inOut", yoyo: true, repeat: reps }, t0 + 1.0);
     });
+  }
+
+  function mayoIn(tl, sc, at, holdEnd) {
+    var m = sc.mayo;
+    tl.set(m.clipRect, { attr: { width: 0 } }, 0);
+    tl.to(m.clipRect, { attr: { width: 760 }, duration: 0.75, ease: "power3.out" }, at);
+    tl.fromTo(m.g, { x: -140, y: 70, rotation: -7, svgOrigin: "0 1200" }, { x: 0, y: 0, rotation: 0, duration: 0.9, ease: "expo.out" }, at);
+    // thick, creamy settle
+    tl.to(m.g, { keyframes: { scaleY: [1.06, 0.97, 1.02, 1], scaleX: [0.98, 1.02, 1] }, svgOrigin: "0 1200", duration: 0.8, ease: "sine.out" }, at + 0.65);
+    m.drops.forEach(function (d, i) {
+      var t0 = at + 0.45 + i * 0.04;
+      tl.set(d.el, { autoAlpha: 0, x: 540, y: 935 }, 0);
+      tl.to(d.el, { autoAlpha: 1, duration: 0.01 }, t0);
+      tl.to(d.el, { x: d.x, duration: 0.7, ease: "power2.out" }, t0);
+      tl.to(d.el, { keyframes: { y: [d.y - 30, d.y] }, duration: 0.7, ease: "power1.out" }, t0);
+      tl.to(d.el, { y: "+=" + (14 + i * 3), duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: Math.max(1, Math.floor((holdEnd - t0 - 0.7) / 1.4) - 1) }, t0 + 0.7);
+    });
+    // slow drip
+    tl.to(m.g, { y: 8, duration: Math.max(1, holdEnd - at - 1.6), ease: "sine.inOut" }, at + 1.5);
   }
 
   function titleIn(tl, sc, at) {
@@ -315,14 +371,16 @@
     scenes.forEach(function (sc) {
       var tl = gsap.timeline();
       photoIn(tl, sc, 0.15);
-      vegIn(tl, sc, 0.95, T - 0.5);
+      vegIn(tl, sc, 1.15, T - 0.5);
+      mayoIn(tl, sc, 1.05, T - 0.5);
       var e = titleIn(tl, sc, 1.05);
       extrasIn(tl, sc, e - 0.3);
-      tl.to(sc.photo, { scale: 1.035, duration: T - 2.6, ease: "none" }, 2.0);
+      tl.to([sc.photo, sc.photoFront], { scale: 1.035, duration: T - 2.6, ease: "none" }, 2.0);
       // exit: everything pushes forward into a flash
       tl.to([sc.titleWrap, sc.tag], { scale: 0.9, autoAlpha: 0, duration: 0.3, ease: "power2.in" }, T - 0.5);
-      tl.to(sc.photo, { scale: 1.2, duration: 0.45, ease: "power2.in" }, T - 0.45);
-      sc.veg.forEach(function (v) { tl.to(v.box, { x: (v.x - 540) * 0.8, y: (v.y - 1150) * 0.5, scale: 1.4, duration: 0.45, ease: "power2.in" }, T - 0.45); });
+      tl.to([sc.photo, sc.photoFront], { scale: 1.2, duration: 0.45, ease: "power2.in" }, T - 0.45);
+      tl.to(sc.mayo.g, { x: -500, autoAlpha: 0, duration: 0.4, ease: "power2.in" }, T - 0.45);
+      sc.veg.forEach(function (v) { tl.to(v.box, { x: (v.x - 540) * 0.8, y: (v.y - 1300) * 0.5, scale: 1.3, duration: 0.45, ease: "power2.in" }, T - 0.45); });
       master.set(scenes.map(function (s) { return s.root; }), { autoAlpha: 0 }, t);
       master.set(sc.root, { autoAlpha: 1 }, t);
       master.add(tl, t);
@@ -340,7 +398,8 @@
   function loadImg(src) {
     return new Promise(function (res) { var im = new Image(); im.onload = function () { (im.decode ? im.decode().catch(function () {}) : Promise.resolve()).then(res); }; im.onerror = res; im.src = src; });
   }
-  var loads = items.map(function (it) { return loadImg(it.image); }).concat([loadImg("images/veg/tomato.png"), loadImg("images/veg/cucumber.png")]);
+  var loads = items.map(function (it) { return loadImg(it.image); }).concat(items.map(function (it) { return loadImg(it.front.src); }))
+    .concat([loadImg("images/veg/tomato.png"), loadImg("images/veg/cucumber.png"), loadImg("images/veg/lettuce.png")]);
   if (document.fonts) { loads.push(document.fonts.load("200px Brush")); loads.push(document.fonts.load("900 40px Montserrat")); }
   Promise.all(loads).then(play);
 })();

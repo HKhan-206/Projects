@@ -27,6 +27,8 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000; curs
           mask-image: linear-gradient(to right, transparent 0, #000 140px);
 }
 .photo img { display: block; width: 100%; height: 100%; }
+/* same photo again, masked to just the burger – lets veg and mayo sit behind it */
+.photo-front { position: absolute; top: -150px; will-change: transform; transform-origin: 50% 52%; }
 
 /* drawn brush graphics (blobs, scribbles, action lines, arrow, panels) */
 .gfx { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: visible; pointer-events: none; }
