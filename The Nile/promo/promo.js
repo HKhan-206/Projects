@@ -64,7 +64,10 @@
   }
   function paint(node, style, size, base, soft) {
     var depth = Math.max(3, Math.round(size * 0.034));
-    if (style === "white") {
+    if (style === "orange") {
+      node.style.color = "#EE6A2E";
+      node.style.textShadow = extrude("#5a1d06", depth, soft);
+    } else if (style === "white") {
       node.style.color = "#ffffff";
       node.style.textShadow = extrude(mix(base, "#000000", 0.38), depth, soft);
     } else {
@@ -122,15 +125,52 @@
   }
 
   /* ---------- building blocks ---------- */
+  // layout positions; the "studio" look puts the words at the top and the food on the pedestal
+  function lay(p) {
+    if (p.look === "studio") return { headlineY: 240, titleY: 530, detailsY: 610, priceY: 625 };
+    var a = slots(p);
+    a.headlineY = L.headlineY;
+    return a;
+  }
+
   function buildScene(p) {
-    var sc = { p: p, base: p.background || "#EE6A2E" };
+    var sc = { p: p, base: p.background || "#EE6A2E", look: p.look || "orange" };
     sc.root = el("section", "scene", stage);
     sc.bg = el("div", "bg", sc.root);
-    sc.bg.style.background = "radial-gradient(120% 78% at 50% 46%, " + mix(sc.base, "#ffffff", 0.14) + " 0%, " +
-      sc.base + " 50%, " + mix(sc.base, "#000000", 0.24) + " 100%)";
-    sc.tone = mix(sc.base, "#000000", 0.14);
+    if (sc.look === "band") {
+      sc.dark = true;
+      sc.root.classList.add("on-dark");
+      sc.bg.style.background = "radial-gradient(110% 70% at 50% 48%, #2a2a2a 0%, #161616 55%, #0b0b0b 100%)";
+    } else if (sc.look === "studio") {
+      sc.dark = true;                       // light words over the darker studio wall
+      sc.studio = true;
+      sc.bg.style.background = "#7a3c0c";
+      var src = p.backdrop || "images/backdrop-studio.jpg";
+      var bd = el("img", "backdrop", sc.bg);
+      bd.src = src;
+      var bi = images[src];
+      // cover the screen (the .bg layer reaches 60px past each edge)
+      var k = bi && bi.naturalHeight ? Math.max((W + 120) / bi.naturalWidth, (H + 120) / bi.naturalHeight) : 1.43;
+      var bw = bi ? bi.naturalWidth * k : 1320, bh = bi ? bi.naturalHeight * k : 1980;
+      Object.assign(bd.style, { width: bw + "px", height: bh + "px", left: ((W + 120 - bw) / 2) + "px", top: ((H + 120 - bh) / 2) + "px" });
+      sc.backdrop = bd;
+    } else {
+      sc.bg.style.background = "radial-gradient(120% 78% at 50% 46%, " + mix(sc.base, "#ffffff", 0.14) + " 0%, " +
+        sc.base + " 50%, " + mix(sc.base, "#000000", 0.24) + " 100%)";
+    }
     sc.glow = el("div", "glow", sc.root);
+    if (sc.look !== "orange") sc.glow.style.display = "none";
     sc.back = el("div", "layer back", sc.root);
+    if (sc.look === "band") {                // diagonal motion shape behind the food
+      var wrap = el("div", "dband-wrap", sc.back);
+      wrap.style.top = (p.imageY || L.foodCY) + "px";
+      sc.band = el("div", "dband", wrap);
+      sc.band.style.background = "linear-gradient(180deg, " + mix(sc.base, "#ffffff", 0.08) + ", " + mix(sc.base, "#000000", 0.08) + ")";
+      sc.bandThin = el("div", "dband thin", wrap);
+      sc.bandThin.style.background = mix(sc.base, "#ffffff", 0.25);
+      sc.bandThin2 = el("div", "dband thin2", wrap);
+      sc.bandThin2.style.background = sc.base;
+    }
     sc.foodWrap = el("div", "food-wrap", sc.root);
     sc.shadow = el("div", "food-shadow", sc.foodWrap);
     sc.img = el("img", "food", sc.foodWrap);
@@ -150,30 +190,14 @@
     var ratio = im && im.naturalWidth ? im.naturalHeight / im.naturalWidth : 0.62;
     var w = p.imageWidth || 940, h = Math.round(w * ratio);
     var cx = p.imageX || 540;
-    var top = p.anchorBottom ? H - h + (p.bottomOffset || 30) : (p.imageY || L.foodCY) - h / 2;
+    var top = p.imageBottom ? p.imageBottom - h : (p.imageY || L.foodCY) - h / 2;
     Object.assign(sc.foodWrap.style, { left: (cx - w / 2) + "px", top: top + "px", width: w + "px", height: h + "px" });
-    var kind = p.shadow || (p.anchorBottom ? "none" : "floor");
-    var s = sc.shadow.style;
-    if (kind === "none") s.display = "none";
-    else if (kind === "round") Object.assign(s, { left: (w * 0.02) + "px", top: (h * 0.07) + "px", width: (w * 0.98) + "px", height: (h * 0.98) + "px" });
-    else Object.assign(s, { left: (w * 0.06) + "px", top: (h - w * 0.075) + "px", width: (w * 0.88) + "px", height: (w * 0.14) + "px" });
+    var kind = p.shadow || "floor";
+    var st = sc.shadow.style;
+    if (kind === "none") st.display = "none";
+    else if (kind === "round") Object.assign(st, { left: (w * 0.02) + "px", top: (h * 0.07) + "px", width: (w * 0.98) + "px", height: (h * 0.98) + "px" });
+    else Object.assign(st, { left: (w * 0.06) + "px", top: (h - w * 0.075) + "px", width: (w * 0.88) + "px", height: (w * 0.14) + "px" });
     sc.foodTop = top; sc.foodH = h; sc.foodW = w;
-  }
-
-  function bigWord(sc, text, size, cy, style, letters) {
-    var wrap = el("div", "big-wrap", sc.back);
-    var strong = el("div", "big", wrap, text);
-    var tone = el("div", "big tone", wrap, text);
-    var fs = size;
-    wrap.style.fontSize = fs + "px";
-    while (strong.offsetWidth > MAXW && fs > 80) { fs -= 6; wrap.style.fontSize = fs + "px"; }   // always fits on screen
-    wrap.style.top = Math.round(cy - fs * 0.41) + "px";
-    paint(strong, style || "black", fs, sc.base, true);
-    tone.style.color = sc.tone;
-    var b = { wrap: wrap, strong: strong, tone: tone, x0: (W - strong.offsetWidth) / 2 };
-    if (letters) b.chars = splitChars(strong);
-    sc.big = b;
-    return b;
   }
 
   function headline(sc, lines, y, size) {
@@ -184,7 +208,8 @@
       var line = el("span", "line", row, t);
       line.style.fontSize = (size || 118) + "px";
       var fs = fitWidth(line, 1000, 56);
-      paint(line, i % 2 ? "white" : "black", fs, sc.base, false);
+      var look = sc.dark ? "white" : (i % 2 ? "white" : "black");
+      paint(line, look, fs, sc.dark ? "#3a1a08" : sc.base, false);
       return line;
     });
   }
@@ -301,178 +326,131 @@
   function shadowIn(tl, sc, at) {
     tl.fromTo(sc.shadow, { autoAlpha: 0, scaleX: 0.4 }, { autoAlpha: 1, scaleX: 1, duration: 0.7, ease: "power2.out" }, at);
   }
-  function toneDown(tl, big, at) {
-    tl.to(big.strong, { autoAlpha: 0, duration: 0.7, ease: "power1.inOut" }, at);
-    tl.fromTo(big.tone, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.7, ease: "power1.inOut" }, at);
-  }
   function shake(tl, sc, at, k) {
     k = k || 1;
     tl.to(sc.root, { keyframes: { x: [14 * k, -11 * k, 7 * k, -3 * k, 0], y: [-6 * k, 5 * k, -3 * k, 1 * k, 0] }, duration: 0.28, ease: "none" }, at);
   }
 
-  /* ---------- animation styles ---------- */
+  /* ---------- animation styles (straight to the food – no words behind it) ---------- */
+  function parts(sc, p) {
+    var a = lay(p);
+    return {
+      hl: headline(sc, p.headline, a.headlineY),
+      title: titleBlock(sc, p, a.titleY),
+      det: p.details ? detailsBlock(sc, p, a.detailsY) : null,
+      pr: offerBlock(sc, p, 540, a.priceY)
+    };
+  }
+  // optional slide-in shapes before the food; returns when the food should start
+  function intro(tl, sc, at) {
+    if (!sc.band) return at;
+    tl.fromTo(sc.band, { x: -4600 }, { x: 0, duration: 0.95, ease: "expo.out" }, at);
+    blur(tl, sc.band, 90, 0.6, at);
+    tl.fromTo(sc.bandThin, { x: 4600 }, { x: 0, duration: 1.0, ease: "expo.out" }, at + 0.12);
+    tl.fromTo(sc.bandThin2, { x: -4600 }, { x: 0, duration: 1.0, ease: "expo.out" }, at + 0.22);
+    return at + 0.45;
+  }
+  // the words, name and price after the food has landed
+  function finish(tl, sc, P, at, how) {
+    logoIn(tl, sc, at - 0.6);
+    if (how === "rise") { lineRise(tl, P.hl[0], at); if (P.hl[1]) lineRise(tl, P.hl[1], at + 0.25); }
+    else if (how === "drop") { charsDrop(tl, P.hl[0], at); if (P.hl[1]) charsDrop(tl, P.hl[1], at + 0.4); }
+    else if (how === "slam") { lineSlam(tl, sc, P.hl[0], at); if (P.hl[1]) lineSlam(tl, sc, P.hl[1], at + 0.35); }
+    else { lineFromSide(tl, P.hl[0], -how, at); if (P.hl[1]) lineFromSide(tl, P.hl[1], how, at + 0.35); }
+    titleIn(tl, P.title, at + 1.0);
+    if (P.det) detailsIn(tl, P.det, at + 1.5);
+    priceIn(tl, P.pr, at + 1.8);
+    return at + 3.0;
+  }
+  function hideAll(tl, sc, P) {
+    hide(tl, [sc.foodWrap, sc.logo, P.det, box(P.pr)].concat(P.hl, P.title.chars));
+  }
+
   var styles = {};
 
-  // big word sweeps right-to-left, food slides in, headline lines arrive from opposite sides
+  // food slides in from the side with a turn
   styles.sweep = function (sc, p) {
-    var tl = gsap.timeline();
-    var dir = p.from === "left" ? -1 : 1;
-    var big = bigWord(sc, p.bigWord || "", p.bigSize || 470, p.bigY || L.bigCY, "black");
-    var hl = headline(sc, p.headline, L.headlineY);
-    var at = slots(p);
-    var title = titleBlock(sc, p, at.titleY), det = p.details ? detailsBlock(sc, p, at.detailsY) : null;
-    var pr = offerBlock(sc, p, 540, at.priceY);
-    hide(tl, [sc.foodWrap, sc.logo, det, box(pr)].concat(hl, title.chars));
-    tl.set(big.tone, { autoAlpha: 0 }, 0);
-
-    var startX = dir > 0 ? W + 80 : -big.strong.offsetWidth - 120;
-    tl.fromTo(big.wrap, { x: startX, rotationY: -38 * dir, transformPerspective: 1200 }, { x: big.x0, rotationY: 0, duration: 1.6, ease: "expo.out" }, 0.1);
-    blur(tl, big.wrap, 80, 0.8, 0.1);
-    logoIn(tl, sc, 1.1);
-    tl.fromTo(sc.foodWrap, { autoAlpha: 0, x: 950 * dir, rotationY: -40 * dir, scale: 0.78, transformPerspective: 1400 },
-      { autoAlpha: 1, x: 0, rotationY: 0, scale: 1, duration: 1.3, ease: "power3.out" }, 1.8);
-    blur(tl, sc.foodWrap, 40, 0.6, 1.8);
-    shadowIn(tl, sc, 2.5);
-    toneDown(tl, big, 2.0);
-    lineFromSide(tl, hl[0], -dir, 3.4);
-    if (hl[1]) lineFromSide(tl, hl[1], dir, 3.8);
-    titleIn(tl, title, 4.8);
-    if (det) detailsIn(tl, det, 5.3);
-    priceIn(tl, pr, 5.8);
-    return { tl: tl, introEnd: 7.0 };
+    var tl = gsap.timeline(), P = parts(sc, p), dir = p.from === "left" ? -1 : 1;
+    hideAll(tl, sc, P);
+    var f = intro(tl, sc, 0.25);
+    tl.fromTo(sc.foodWrap, { autoAlpha: 0, x: 1000 * dir, rotationY: -40 * dir, scale: 0.8, transformPerspective: 1400 },
+      { autoAlpha: 1, x: 0, rotationY: 0, scale: 1, duration: 1.2, ease: "power3.out" }, f);
+    blur(tl, sc.foodWrap, 45, 0.6, f);
+    shadowIn(tl, sc, f + 0.7);
+    return { tl: tl, introEnd: finish(tl, sc, P, f + 1.1, dir) };
   };
 
-  // words slam in one at a time; the last becomes the giant word behind the food
+  // words slam in one at a time and clear away, then the food zooms in
   styles.slam = function (sc, p) {
-    var tl = gsap.timeline();
-    var words = p.slamWords && p.slamWords.length ? p.slamWords : [p.bigWord || ""];
-    var last = words[words.length - 1];
-    var big = bigWord(sc, last, p.bigSize || 440, p.bigY || L.bigCY, "white");
-    var hl = headline(sc, p.headline, L.headlineY);
-    var at = slots(p);
-    var title = titleBlock(sc, p, at.titleY), det = p.details ? detailsBlock(sc, p, at.detailsY) : null;
-    var pr = offerBlock(sc, p, 540, at.priceY);
-    hide(tl, [sc.foodWrap, sc.logo, det, box(pr), big.wrap].concat(hl, title.chars));
-    tl.set(big.tone, { autoAlpha: 0 }, 0);
-
-    var t = 0.15;
-    words.slice(0, -1).forEach(function (w, i) {
+    var tl = gsap.timeline(), P = parts(sc, p);
+    hideAll(tl, sc, P);
+    var t = 0.3, words = p.slamWords || [];
+    words.forEach(function (w, i) {
+      var last = i === words.length - 1;
       var n = el("div", "slam-word", sc.front);
       var inner = el("span", "line", n, w);
       inner.style.fontSize = "300px";
-      var fs = fitWidth(inner, 960, 80);           // always fits on screen
-      n.style.top = Math.round(L.bigCY - fs * 0.42) + "px";
-      paint(inner, i % 2 ? "black" : "white", fs, sc.base, true);
+      var fs = fitWidth(inner, 960, 80);             // always fits on screen
+      n.style.top = Math.round(960 - fs * 0.42) + "px";
+      paint(inner, sc.dark ? (i % 2 ? "orange" : "white") : (i % 2 ? "black" : "white"), fs, sc.base, true);
       tl.set(n, { autoAlpha: 0 }, 0);
       tl.fromTo(n, { autoAlpha: 1, scale: 2.6 }, { scale: 1, duration: 0.32, ease: "power4.out" }, t);
       blur(tl, n, 24, 0.3, t, "xy");
-      shake(tl, sc, t + 0.27);
-      tl.to(n, { autoAlpha: 0, scale: 0.7, duration: 0.18, ease: "power2.in" }, t + 0.5);
-      t += 0.62;
+      shake(tl, sc, t + 0.27, last ? 1.4 : 1);
+      if (last) tl.to(n, { scale: 3.2, autoAlpha: 0, duration: 0.35, ease: "power2.in" }, t + 0.75);
+      else tl.to(n, { autoAlpha: 0, scale: 0.7, duration: 0.18, ease: "power2.in" }, t + 0.5);
+      t += last ? 1.05 : 0.62;
     });
-    tl.fromTo(big.wrap, { autoAlpha: 1, x: big.x0, scale: 2.6, transformOrigin: "50% 50%" }, { scale: 1, duration: 0.36, ease: "power4.out" }, t);
-    blur(tl, big.wrap, 26, 0.34, t, "xy");
-    shake(tl, sc, t + 0.3, 1.3);
-    var z = t + 0.7;
-    toneDown(tl, big, z);
-    tl.fromTo(sc.foodWrap, { autoAlpha: 0, scale: 1.9 }, { autoAlpha: 1, scale: 1, duration: 1.0, ease: "expo.out" }, z + 0.15);
-    blur(tl, sc.foodWrap, 22, 0.5, z + 0.15, "xy");
-    shadowIn(tl, sc, z + 0.7);
-    logoIn(tl, sc, z + 0.9);
-    lineSlam(tl, sc, hl[0], z + 1.5);
-    if (hl[1]) lineSlam(tl, sc, hl[1], z + 1.85);
-    titleIn(tl, title, z + 2.6);
-    if (det) detailsIn(tl, det, z + 3.1);
-    priceIn(tl, pr, z + 3.5);
-    return { tl: tl, introEnd: z + 4.7 };
+    var f = intro(tl, sc, t);
+    tl.fromTo(sc.foodWrap, { autoAlpha: 0, scale: 1.9 }, { autoAlpha: 1, scale: 1, duration: 1.0, ease: "expo.out" }, f);
+    blur(tl, sc.foodWrap, 22, 0.5, f, "xy");
+    shadowIn(tl, sc, f + 0.6);
+    return { tl: tl, introEnd: finish(tl, sc, P, f + 1.0, "slam") };
   };
 
-  // letters rise from below, food rises from the bottom edge
+  // food rises up from the bottom of the screen
   styles.rise = function (sc, p) {
-    var tl = gsap.timeline();
-    var big = bigWord(sc, p.bigWord || "", p.bigSize || 520, p.bigY || (p.anchorBottom ? 1040 : L.bigCY), "black", true);
-    var hl = headline(sc, p.headline, L.headlineY);
-    var title, det, pr;
-    if (p.anchorBottom) {
-      title = titleBlock(sc, p, 590);
-      det = p.details ? detailsBlock(sc, p, 680) : null;
-      pr = offerBlock(sc, p, 815, 1320, 190, 450);
-    } else {
-      var at = slots(p);
-      title = titleBlock(sc, p, at.titleY);
-      det = p.details ? detailsBlock(sc, p, at.detailsY) : null;
-      pr = offerBlock(sc, p, 540, at.priceY);
-    }
-    hide(tl, [sc.foodWrap, sc.logo, det, box(pr)].concat(hl, title.chars));
-    tl.set(big.tone, { autoAlpha: 0 }, 0);
-    tl.set(big.wrap, { x: big.x0 }, 0);
-
-    tl.fromTo(big.chars, { autoAlpha: 0, y: 900 }, { autoAlpha: 1, y: 0, duration: 1.0, ease: "expo.out", stagger: 0.08 }, 0.1);
-    blur(tl, big.wrap, 45, 0.8, 0.1, "y");
-    tl.fromTo(sc.foodWrap, { autoAlpha: 1, y: H - sc.foodTop + 40, rotation: -5 }, { y: 0, rotation: 0, duration: 1.5, ease: "power3.out" }, 1.0);
-    if (!p.anchorBottom) shadowIn(tl, sc, 2.1);
-    blur(tl, sc.foodWrap, 35, 0.7, 1.0, "y");
-    toneDown(tl, big, 1.7);
-    logoIn(tl, sc, 1.6);
-    lineRise(tl, hl[0], 2.7);
-    if (hl[1]) lineRise(tl, hl[1], 2.95);
-    titleIn(tl, title, 3.9);
-    if (det) detailsIn(tl, det, 4.4);
-    priceIn(tl, pr, 4.9, p.anchorBottom ? -3 : 0);
-    return { tl: tl, introEnd: 6.2 };
+    var tl = gsap.timeline(), P = parts(sc, p);
+    hideAll(tl, sc, P);
+    var f = intro(tl, sc, 0.25);
+    tl.fromTo(sc.foodWrap, { autoAlpha: 1, y: H - sc.foodTop + 40, rotation: -5 }, { y: 0, rotation: 0, duration: 1.4, ease: "power3.out" }, f);
+    blur(tl, sc.foodWrap, 35, 0.7, f, "y");
+    shadowIn(tl, sc, f + 1.0);
+    return { tl: tl, introEnd: finish(tl, sc, P, f + 1.2, "rise") };
   };
 
-  // big word sweeps left-to-right, food rolls in spinning
+  // food rolls in spinning (pizza)
   styles.spin = function (sc, p) {
-    var tl = gsap.timeline();
-    var big = bigWord(sc, p.bigWord || "", p.bigSize || 500, p.bigY || L.bigCY, "black");
-    var hl = headline(sc, p.headline, L.headlineY);
-    var at = slots(p);
-    var title = titleBlock(sc, p, at.titleY), det = p.details ? detailsBlock(sc, p, at.detailsY) : null;
-    var pr = offerBlock(sc, p, 540, at.priceY);
-    hide(tl, [sc.foodWrap, sc.logo, det, box(pr)].concat(hl, title.chars));
-    tl.set(big.tone, { autoAlpha: 0 }, 0);
-
-    tl.fromTo(big.wrap, { x: -big.strong.offsetWidth - 120, rotationY: 38, transformPerspective: 1200 }, { x: big.x0, rotationY: 0, duration: 1.6, ease: "expo.out" }, 0.1);
-    blur(tl, big.wrap, 80, 0.8, 0.1);
-    logoIn(tl, sc, 1.0);
-    tl.fromTo(sc.foodWrap, { autoAlpha: 1, x: 1150, scale: 0.8 }, { x: 0, scale: 1, duration: 1.6, ease: "power3.out" }, 1.0);
-    tl.fromTo(sc.img, { rotation: 240 }, { rotation: 0, duration: 1.6, ease: "power3.out" }, 1.0);
-    shadowIn(tl, sc, 1.9);
-    toneDown(tl, big, 1.9);
-    lineFromSide(tl, hl[0], 1, 3.0);
-    if (hl[1]) lineFromSide(tl, hl[1], -1, 3.35);
-    titleIn(tl, title, 4.3);
-    if (det) detailsIn(tl, det, 4.8);
-    priceIn(tl, pr, 5.3);
-    return { tl: tl, introEnd: 6.5 };
+    var tl = gsap.timeline(), P = parts(sc, p);
+    hideAll(tl, sc, P);
+    var f = intro(tl, sc, 0.25);
+    tl.fromTo(sc.foodWrap, { autoAlpha: 1, x: 1150, scale: 0.8 }, { x: 0, scale: 1, duration: 1.5, ease: "power3.out" }, f);
+    tl.fromTo(sc.img, { rotation: 240 }, { rotation: 0, duration: 1.5, ease: "power3.out" }, f);
+    shadowIn(tl, sc, f + 0.9);
+    return { tl: tl, introEnd: finish(tl, sc, P, f + 1.3, 1) };
   };
 
-  // letters drop from the top, food drops and lands
+  // food drops in from the top and lands with a bounce
   styles.drop = function (sc, p) {
-    var tl = gsap.timeline();
-    var big = bigWord(sc, p.bigWord || "", p.bigSize || 480, p.bigY || L.bigCY, "white", true);
-    var hl = headline(sc, p.headline, L.headlineY);
-    var at = slots(p);
-    var title = titleBlock(sc, p, at.titleY), det = p.details ? detailsBlock(sc, p, at.detailsY) : null;
-    var pr = offerBlock(sc, p, 540, at.priceY);
-    hide(tl, [sc.foodWrap, sc.logo, det, box(pr)].concat(hl, title.chars));
-    tl.set(big.tone, { autoAlpha: 0 }, 0);
-    tl.set(big.wrap, { x: big.x0 }, 0);
+    var tl = gsap.timeline(), P = parts(sc, p);
+    hideAll(tl, sc, P);
+    var f = intro(tl, sc, 0.25);
+    tl.fromTo(sc.foodWrap, { autoAlpha: 1, y: -sc.foodTop - sc.foodH - 80, rotation: 6 }, { y: 0, rotation: 0, duration: 1.05, ease: "bounce.out" }, f);
+    blur(tl, sc.foodWrap, 30, 0.5, f, "y");
+    shadowIn(tl, sc, f + 0.5);
+    return { tl: tl, introEnd: finish(tl, sc, P, f + 1.2, "drop") };
+  };
 
-    tl.fromTo(big.chars, { autoAlpha: 0, y: -1100 }, { autoAlpha: 1, y: 0, duration: 0.9, ease: "back.out(1.6)", stagger: 0.07 }, 0.1);
-    blur(tl, big.wrap, 40, 0.7, 0.1, "y");
-    tl.fromTo(sc.foodWrap, { autoAlpha: 1, y: -1600, rotation: 7 }, { y: 0, rotation: 0, duration: 1.15, ease: "back.out(1.3)" }, 1.0);
-    blur(tl, sc.foodWrap, 30, 0.6, 1.0, "y");
-    shadowIn(tl, sc, 1.75);
-    toneDown(tl, big, 1.8);
-    logoIn(tl, sc, 1.6);
-    charsDrop(tl, hl[0], 2.6);
-    if (hl[1]) charsDrop(tl, hl[1], 3.0);
-    titleIn(tl, title, 4.0);
-    if (det) detailsIn(tl, det, 4.5);
-    priceIn(tl, pr, 5.0);
-    return { tl: tl, introEnd: 6.2 };
+  // camera pulls back onto the food
+  styles.zoom = function (sc, p) {
+    var tl = gsap.timeline(), P = parts(sc, p);
+    hideAll(tl, sc, P);
+    if (sc.backdrop) tl.fromTo(sc.backdrop, { scale: 1.25 }, { scale: 1, duration: 1.6, ease: "power3.out" }, 0);
+    var f = intro(tl, sc, 0.25);
+    tl.fromTo(sc.foodWrap, { autoAlpha: 0, scale: 2.2, y: -120 }, { autoAlpha: 1, scale: 1, y: 0, duration: 1.2, ease: "expo.out" }, f);
+    blur(tl, sc.foodWrap, 20, 0.5, f, "xy");
+    shadowIn(tl, sc, f + 0.7);
+    return { tl: tl, introEnd: finish(tl, sc, P, f + 1.1, -1) };
   };
 
   /* ---------- slogan slides (words only, no food) ---------- */
@@ -655,28 +633,29 @@
     if (dur <= 0) return;
     tl.to(sc.foodWrap, { y: p.anchorBottom ? -10 : -16, scale: 1.025, duration: dur, ease: "sine.inOut" }, at);
     if (p.animation === "spin") tl.to(sc.img, { rotation: 12, duration: dur, ease: "none" }, at);
-    if (sc.big) tl.to(sc.big.wrap, { x: sc.big.x0 - 30, duration: dur, ease: "none" }, at);
+    if (sc.band) tl.to(sc.band, { x: -60, duration: dur, ease: "none" }, at);
     tl.fromTo(sc.glow, { scale: 1, opacity: 0.8 }, { scale: 1.1, opacity: 1, duration: dur, ease: "sine.inOut" }, at);
   }
 
   /* ---------- sweep between promotions ---------- */
   var wipe, bandA, bandB;
-  var COVER = -310, RIGHT = 1400, LEFT = -2050;
+  var BELOW = 2700, COVER = -1250, ABOVE = -5200;   // positions along the diagonal
   function buildWipe() {
     wipe = el("div", "wipe", stage);
-    bandA = el("div", "wipe-band", wipe);
-    bandB = el("div", "wipe-band", wipe);
-    bandA.style.background = "#C9471C";
+    var rot = el("div", "wipe-rot", wipe);
+    bandA = el("div", "wipe-band", rot);
+    bandB = el("div", "wipe-band", rot);
+    bandA.style.background = "#EE6A2E";
     bandB.style.background = S.wipeColour;
-    gsap.set([bandA, bandB], { skewX: -14, x: COVER });
+    gsap.set([bandA, bandB], { y: COVER });
   }
-  function wipeIn(tl, at) {   // covers the screen, finishing exactly at "at"
-    tl.fromTo(bandA, { x: RIGHT }, { x: COVER, duration: 0.45, ease: "power3.in" }, at - 0.55);
-    tl.fromTo(bandB, { x: RIGHT }, { x: COVER, duration: 0.5, ease: "power3.in" }, at - 0.5);
+  function wipeIn(tl, at) {   // diagonal bands cover the screen, finishing exactly at "at"
+    tl.fromTo(bandA, { y: BELOW }, { y: COVER, duration: 0.45, ease: "power3.in" }, at - 0.55);
+    tl.fromTo(bandB, { y: BELOW }, { y: COVER, duration: 0.5, ease: "power3.in" }, at - 0.5);
   }
-  function wipeOut(tl, at) {  // uncovers the screen, starting at "at"
-    tl.fromTo(bandB, { x: COVER }, { x: LEFT, duration: 0.55, ease: "power3.out", immediateRender: false }, at + 0.02);
-    tl.fromTo(bandA, { x: COVER }, { x: LEFT, duration: 0.6, ease: "power3.out", immediateRender: false }, at + 0.12);
+  function wipeOut(tl, at) {  // and carry on off the top, starting at "at"
+    tl.fromTo(bandB, { y: COVER }, { y: ABOVE, duration: 0.6, ease: "power3.out", immediateRender: false }, at + 0.02);
+    tl.fromTo(bandA, { y: COVER }, { y: ABOVE, duration: 0.65, ease: "power3.out", immediateRender: false }, at + 0.12);
   }
 
   /* ---------- stage scaling ---------- */
@@ -709,7 +688,8 @@
   var fonts = ["900 100px Montserrat", "800 100px Montserrat", "600 40px 'Barlow Semi Condensed'"].map(function (f) {
     return document.fonts ? document.fonts.load(f) : Promise.resolve();
   });
-  var loads = promos.filter(function (p) { return p.image; }).map(function (p) { return loadImage(p.image); }).concat([loadImage(S.logo)], fonts);
+  var loads = promos.filter(function (p) { return p.image; }).map(function (p) { return loadImage(p.image); })
+    .concat(promos.filter(function (p) { return p.look === "studio"; }).map(function (p) { return loadImage(p.backdrop || "images/backdrop-studio.jpg"); })).concat([loadImage(S.logo)], fonts);
 
   Promise.all(loads).then(function () { return document.fonts ? document.fonts.ready : null; }).then(start);
 

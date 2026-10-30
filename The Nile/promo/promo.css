@@ -201,3 +201,22 @@ html, body {
   letter-spacing: -0.03em;
 }
 .logo-center { top: auto; width: 760px; margin-left: -380px; padding: 34px 58px; border-radius: 44px; }
+
+/* studio backdrop */
+.backdrop { position: absolute; display: block; will-change: transform; transform-origin: 50% 70%; }
+
+/* diagonal motion band behind the food */
+.dband-wrap { position: absolute; left: 540px; width: 0; height: 0; transform: rotate(-31deg); }
+.dband { position: absolute; left: -2300px; width: 4600px; top: -260px; height: 520px; will-change: transform; }
+.dband.thin { top: 290px; height: 30px; }
+.dband.thin2 { top: -318px; height: 14px; }
+
+/* words on the dark looks */
+.on-dark .title { color: #ffffff; }
+.on-dark .details { color: #eeeeee; }
+.on-dark .price { background: #ffffff; color: #111111; box-shadow: 0 14px 0 rgba(0, 0, 0, 0.55), 0 40px 70px rgba(0, 0, 0, 0.45); }
+.on-dark .price-label, .on-dark .price .cur { color: #E2561E; }
+
+/* diagonal wipe between scenes */
+.wipe-rot { position: absolute; left: 540px; top: 960px; width: 0; height: 0; transform: rotate(-31deg); }
+.wipe-rot .wipe-band { position: absolute; left: -2600px; top: 0; width: 5200px; height: 2500px; }

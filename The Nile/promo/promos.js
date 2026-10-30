@@ -7,13 +7,16 @@
 
    ORDER      = the order the promotions appear in this list.
    enabled    = false hides a promotion without deleting it.
+   look       = "orange" (default), "band" (dark background, diagonal orange band
+                slides in behind the food) or "studio" (burger on the studio pedestal;
+                imageX / imageBottom place it on the pedestal).
    animation  = which motion style to use:
-                "sweep"  big word sweeps across, food slides in from the side
-                "slam"   words slam onto the screen one at a time, food zooms in
-                "rise"   letters and food rise up from the bottom
-                "spin"   big word sweeps, food rolls in spinning (good for pizza)
-                "drop"   letters and food drop in from the top
-                (big words: bigWord; slam style uses slamWords)
+                "sweep"  food slides in from the side (from: "left" to reverse)
+                "slam"   slamWords slam on one at a time and clear, then the food zooms in
+                "rise"   food rises up from the bottom
+                "spin"   food rolls in spinning (good for pizza)
+                "drop"   food drops in from the top and bounces
+                "zoom"   the camera pulls back onto the food
    duration   = minimum seconds on screen (it stays longer if the animation needs it).
    price      = the item price.
    mealPrice  = after the item price shows, it flips over to "MAKE IT A MEAL"
@@ -57,7 +60,7 @@ window.PROMO_CONFIG = {
       background: "#EE6A2E",
       image: "images/hot-mexican-burger.png",
       imageWidth: 960,                       // size of the photo on screen (pixels)
-      slamWords: ["BRING", "THE", "HEAT."],  // one at a time; the last stays behind the food
+      slamWords: ["BRING", "THE", "HEAT."],  // slam in one at a time, then clear away before the food
       headline: ["BIG. BOLD.", "LOADED."],
       title: "HOT MEXICAN BURGER",
       price: "3.79",
@@ -83,10 +86,10 @@ window.PROMO_CONFIG = {
     {
       id: "grilled-chicken-burger",
       animation: "sweep",
+      look: "band",                          // dark background, diagonal orange band slides in
       background: "#EC632B",
       image: "images/grilled-chicken-burger.png",
       imageWidth: 960,
-      bigWord: "GRILLED",
       headline: ["TURN UP", "THE FLAVOUR."],
       title: "GRILLED CHICKEN BURGER",
       price: "4.29",
@@ -98,7 +101,6 @@ window.PROMO_CONFIG = {
       background: "#EE6A2E",
       image: "images/chicken-tikka-wrap.png",
       imageWidth: 880,
-      bigWord: "TIKKA",
       headline: ["WRAPPED TO", "PERFECTION."],
       title: "CHICKEN TIKKA WRAP",
       price: "3.99",
@@ -106,12 +108,12 @@ window.PROMO_CONFIG = {
     },
     {
       id: "peri-burger",
-      animation: "sweep",
-      from: "left",                          // big word and food come in from the left
+      animation: "drop",
+      look: "studio",                        // burger on the studio pedestal
+      imageX: 545, imageBottom: 1545,
       background: "#EC632B",
       image: "images/peri-burger.png",
-      imageWidth: 960,
-      bigWord: "PERI",
+      imageWidth: 800,
       headline: ["FEEL", "THE HEAT."],
       title: "PERI BURGER",
       price: "4.30",
@@ -132,11 +134,12 @@ window.PROMO_CONFIG = {
     },
     {
       id: "chicken-fillet-burger",
-      animation: "drop",
+      animation: "sweep",
+      look: "band",
+      from: "left",
       background: "#EE6A2E",
       image: "images/chicken-fillet-burger.png",
       imageWidth: 940,
-      bigWord: "CRUNCH",
       headline: ["BUILT TO", "SATISFY."],
       title: "CHICKEN FILLET BURGER",
       price: "3.89",
@@ -144,11 +147,10 @@ window.PROMO_CONFIG = {
     },
     {
       id: "sizzler-burger",
-      animation: "rise",
+      animation: "drop",
       background: "#EC632B",
       image: "images/sizzler-burger.png",
       imageWidth: 960,
-      bigWord: "SIZZLE",
       headline: ["CRAVINGS", "SORTED."],
       title: "SIZZLER BURGER",
       price: "3.99",
@@ -179,30 +181,30 @@ window.PROMO_CONFIG = {
       image: "images/chicken-tikka-pizza.png",
       imageWidth: 820,
       shadow: "round",
-      bigWord: "SLICE",
       headline: ["SLICE INTO", "FLAVOUR."],
       title: "CHICKEN TIKKA\nSPECIAL PIZZA",   // \n = new line
       titleSize: 100                           // no price, so the name is shown bigger
     },
     {
       id: "asian-pizza",
-      animation: "drop",
+      animation: "sweep",
+      look: "band",
       background: "#EE6A2E",
       image: "images/asian-pizza.png",
       imageWidth: 820,
       shadow: "round",
-      bigWord: "LOADED",
       headline: ["ONE SLICE IS", "NEVER ENOUGH."],
       title: "ASIAN STYLE\nPIZZA",
       titleSize: 100
     },
     {
       id: "egg-burger",
-      animation: "sweep",
+      animation: "zoom",
+      look: "studio",
+      imageX: 545, imageBottom: 1545,
       background: "#EC632B",
       image: "images/egg-burger.png",
-      imageWidth: 940,
-      bigWord: "YOLK",
+      imageWidth: 800,
       headline: ["THE ULTIMATE", "BURGER."],
       title: "EGG BURGER",
       price: "4.49",
@@ -239,12 +241,11 @@ window.PROMO_CONFIG = {
     },
     {
       id: "mega-burger",
-      animation: "sweep",
-      from: "left",
+      animation: "rise",
+      look: "band",
       background: "#EC632B",
       image: "images/mega-burger.png",
       imageWidth: 920,
-      bigWord: "MEGA",
       headline: ["BIG BITE.", "BIG FLAVOUR."],
       title: "MEGA BURGER",
       price: "4.49",
@@ -252,12 +253,11 @@ window.PROMO_CONFIG = {
     },
     {
       id: "milkshakes",
-      animation: "rise",
+      animation: "zoom",
       background: "#EF7030",
       image: "images/milkshake.png",
       imageWidth: 380,
       imageY: 945,
-      bigWord: "SHAKE",
       headline: ["YOUR NEXT", "FAVOURITE."],
       title: "MILKSHAKES",
       details: "Ferrero Rocher · Kinder Bueno · Lotus Biscoff · Oreo & more",

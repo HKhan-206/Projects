@@ -76,7 +76,7 @@ then change it:
   background: "#EE6A2E",       // orange for this promotion
   image: "images/donner-kebab.png",
   imageWidth: 950,
-  bigWord: "KEBAB",            // giant word behind the food
+  look: "band",                // optional: "band" (diagonal band) or "studio" (pedestal backdrop)
   headline: ["BIG. BOLD.", "LOADED."],
   title: "DONNER KEBAB",       // just the item name
   price: "6.49",               // item price
@@ -98,11 +98,16 @@ Each beat is one screen of animated words with its own background colour.
 The options are explained at the top of `promos.js`. Copy an existing slogan block to make a new one.
 
 **Animation styles:**
-- `sweep`: giant word sweeps across, food slides in from the side. Add `from: "left"` to come from the left.
-- `slam`: words slam onto the screen one at a time (`slamWords: ["BRING", "THE", "HEAT."]`), food zooms in.
-- `rise`: letters and food rise up from the bottom of the screen.
-- `spin`: giant word sweeps, food rolls in spinning. Best for flat items like pizza (add `shadow: "round"`).
-- `drop`: letters and food drop in from the top.
+- `sweep`: food slides in from the side. Add `from: "left"` to come from the left.
+- `slam`: words slam onto the screen one at a time (`slamWords: ["BRING", "THE", "HEAT."]`), clear away, then the food zooms in.
+- `rise`: food rises up from the bottom of the screen.
+- `spin`: food rolls in spinning. Best for flat items like pizza (add `shadow: "round"`).
+- `drop`: food drops in from the top and bounces.
+- `zoom`: the camera pulls back onto the food.
+
+**Looks:** `look: "band"` gives a dark background with a diagonal orange band sliding in behind
+the food. `look: "studio"` puts the burger on the studio pedestal backdrop
+(`imageX` / `imageBottom` position it on the pedestal). Leave `look` out for plain orange.
 
 Every word is automatically sized to fit inside the screen.
 
