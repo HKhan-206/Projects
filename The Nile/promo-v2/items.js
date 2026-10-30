@@ -8,7 +8,7 @@
      id       = the photo in images/items/<id>.jpg
      title    = the big brush lettering, one line each: ["WORD", "w" white / "y" yellow]
      tagline  = two lines on the small dark panel (top white, bottom yellow)
-     zoom     = optional, e.g. 0.86 shows the photo a little smaller
+     zoom     = optional, e.g. 1.04 shows the photo a little bigger, 0.9 smaller
      enabled  = false hides a slide without deleting it
 
    SLOGAN SLIDES (type: "slogan") – words only, animated. Each "beat" is one
@@ -22,10 +22,10 @@
    ===================================================================== */
 
 window.PROMO2 = {
-  logo: "../assets/logo.png",          // full logo (used on slogan slides)
+  logo: "images/logo-stacked.png",     // stacked logo (used big on slogan slides)
   badge: "images/logo-triangle.png",   // triangle only, in the black circle on food slides
   orange: "#FD7E14",                   // the orange of the new photos (used on slogan slides)
-  itemSeconds: 7.5,
+  itemSeconds: 12,                     // seconds each food slide stays on screen
   slides: [
     {
       id: "grilled-chicken-burger",
@@ -37,7 +37,7 @@ window.PROMO2 = {
     {
       id: "hot-mexican-burger",
       title: [["HOT", "w"], ["MEXICAN", "w"], ["BURGER", "y"]],
-      tagline: ["BRING THE HEAT", "JALAPEÑO KICK"],
+      tagline: ["BRING THE HEAT", "LOADED WITH CHILLIES"],
       layerW: 1536, layerH: 2402,   // size of the extended photo – do not edit
       bgStops: [[0.0, "#fc7d11"], [3.3, "#fc7d11"], [6.7, "#fc7d11"], [10.0, "#fc7d12"], [13.3, "#fc7d11"], [16.7, "#fc7d11"], [20.0, "#fc7d12"], [23.3, "#fc7d11"], [26.6, "#fc7d12"], [30.0, "#fc7d12"], [33.3, "#fc7d12"], [36.6, "#fc7d12"], [40.0, "#fc7d12"], [43.3, "#fd7e11"], [46.6, "#fd7e13"], [50.0, "#fd7e13"], [53.3, "#fd7e13"], [56.6, "#fd7d12"], [60.0, "#fc7d12"], [63.3, "#fd7d12"], [66.6, "#fc7d14"], [69.9, "#fe7b0f"], [73.3, "#fd7a0e"], [76.6, "#fd7e13"], [79.9, "#fd7e13"], [83.3, "#fd8013"], [86.6, "#fd7f13"], [89.9, "#fd7f12"], [93.3, "#fd7f12"], [96.6, "#fd7f12"], [99.9, "#fd7f12"], [100, "#fc7f12"]]
     },
@@ -126,16 +126,16 @@ window.PROMO2 = {
     },
     {
       id: "asian-style-pizza",
-      title: [["ASIAN", "w"], ["STYLE", "w"], ["PIZZA", "y"]],
-      zoom: 0.86,
+      title: [["ASIAN STYLE", "w"], ["PIZZA", "y"]],
+      zoom: 1.04,
       tagline: ["LOADED TOPPINGS", "CRAVING A SLICE?"],
       layerW: 1536, layerH: 2402,   // size of the extended photo – do not edit
       bgStops: [[0.0, "#fd8313"], [3.3, "#fd8313"], [6.7, "#fd8313"], [10.0, "#fd8313"], [13.3, "#fd8313"], [16.7, "#fd8313"], [20.0, "#fd8313"], [23.3, "#fd8212"], [26.6, "#fd8212"], [30.0, "#fd8213"], [33.3, "#fe8212"], [36.6, "#fd8213"], [40.0, "#fd8113"], [43.3, "#ff8214"], [46.6, "#fd8314"], [50.0, "#fd8314"], [53.3, "#fd8314"], [56.6, "#fc8214"], [60.0, "#fc8115"], [63.3, "#fd8213"], [66.6, "#fd8113"], [69.9, "#fc8113"], [73.3, "#fc8214"], [76.6, "#fc8213"], [79.9, "#fc8213"], [83.3, "#fc8113"], [86.6, "#fc8213"], [89.9, "#fc8213"], [93.3, "#fc8212"], [96.6, "#fc8212"], [99.9, "#fd8113"], [100, "#fc8112"]]
     },
     {
       id: "chicken-tikka-special-pizza",
-      title: [["CHICKEN", "w"], ["TIKKA", "w"], ["SPECIAL", "w"], ["PIZZA", "y"]],
-      zoom: 0.86,               // shows the photo slightly smaller
+      title: [["CHICKEN TIKKA", "w"], ["SPECIAL PIZZA", "y"]],
+      zoom: 1.04,               // shows the photo slightly bigger
       tagline: ["CHICKEN & JALAPEÑOS", "SLICE INTO FLAVOUR"],
       layerW: 1536, layerH: 2402,   // size of the extended photo – do not edit
       bgStops: [[0.0, "#fd8111"], [3.3, "#fc8011"], [6.7, "#fc8011"], [10.0, "#fd8111"], [13.3, "#fd8011"], [16.7, "#fd8011"], [20.0, "#fd8111"], [23.3, "#fd8011"], [26.6, "#fc8011"], [30.0, "#fc8111"], [33.3, "#fc8012"], [36.6, "#fd8012"], [40.0, "#fd8013"], [43.3, "#fe8113"], [46.6, "#fd8113"], [50.0, "#fd8012"], [53.3, "#fc8115"], [56.6, "#fc8215"], [60.0, "#fe8113"], [63.3, "#fe8113"], [66.6, "#fc8215"], [69.9, "#fd8215"], [73.3, "#fd8012"], [76.6, "#fd8014"], [79.9, "#fe8115"], [83.3, "#fc8214"], [86.6, "#fc8114"], [89.9, "#fc8113"], [93.3, "#fc8113"], [96.6, "#fd8114"], [99.9, "#fc8013"], [100, "#fc8114"]]
@@ -166,9 +166,7 @@ window.PROMO2 = {
           { t: "ESPECIALLY", size: 190, colour: "white", in: "stretch" },
           { t: "WHEN IT’S", size: 190, colour: "white", in: "fromRight", at: 0.35 },
           { t: "FROM", size: 250, colour: "orange", in: "fromLeft", at: 0.55 } ] },
-        { bg: "orange", logo: "top", ghost: "THE NILE", hold: 1.8, out: "none", lines: [
-          { t: "THE", size: 200, colour: "black", in: "drop" },
-          { t: "NILE.", size: 360, colour: "white", in: "slam", at: 0.45, shake: 1.4 } ] }
+        { bg: "orange", logo: "center", hold: 2.2, out: "none", lines: [] }
       ]
     },
     {

@@ -187,6 +187,7 @@
       return { el: line, chars: chars };
     });
     var fs = it.title.length > 3 ? 190 : it.title.length > 2 ? 230 : 280;
+    if (it.titleSize) fs = it.titleSize;
     sc.title.style.fontSize = fs + "px";
     sc.lines.forEach(function (l) { l.el.style.display = "inline-block"; l.el.style.float = "left"; l.el.style.clear = "left"; });
     function widest() { return Math.max.apply(null, sc.lines.map(function (l) { return l.el.offsetWidth; })); }
@@ -234,12 +235,11 @@
       fill: "none", stroke: "#ffffff", "stroke-width": 9, "stroke-linecap": "round" }, front);
     sc.arrowHead = sv("path", { d: "M" + (ax + 44) + "," + (ay + 142) + " L" + (ax + 82) + "," + (ay + 141) + " L" + (ax + 70) + "," + (ay + 106),
       fill: "none", stroke: "#ffffff", "stroke-width": 9, "stroke-linecap": "round", "stroke-linejoin": "round" }, front);
-    // logo badge: black brush circle with speech tail, original-colour triangle inside
+    // logo badge: black brush circle, original-colour triangle inside
     var bx = 935, by = Math.max(top + tH + 60, 700);
     sc.badge = sv("g", {}, front);
     var gB = sv("g", { filter: "url(#roughSoft)" }, sc.badge);
     sv("circle", { cx: bx, cy: by, r: 112, fill: "#1c0d05" }, gB);
-    sv("path", { d: "M" + (bx - 78) + "," + (by + 66) + " L" + (bx - 112) + "," + (by + 128) + " L" + (bx - 30) + "," + (by + 100) + " Z", fill: "#1c0d05" }, gB);
     sv("circle", { cx: bx, cy: by, r: 100, fill: "none", stroke: "#3a1d0c", "stroke-width": 4 }, sc.badge);
     var tri = sv("image", { href: CFG.badge, x: bx - 66, y: by - 62, width: 132, height: 111 }, sc.badge);
     tri.setAttributeNS("http://www.w3.org/1999/xlink", "href", CFG.badge);
@@ -461,7 +461,7 @@
       }
       var stack = [], logoEl = null;
       if (b.logo === "center" || b.logo === "top") {
-        logoEl = el("div", "logo" + (b.logo === "center" ? " logo-center" : ""), beat);
+        logoEl = el("div", "logo-big", beat);
         var li = el("img", null, logoEl); li.src = CFG.logo; li.alt = "The Nile";
         if (b.logo === "center") stack.push({ node: logoEl, h: logoEl.offsetHeight });
       }
