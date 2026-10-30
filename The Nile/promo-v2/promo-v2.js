@@ -468,17 +468,18 @@
       var lines = (b.lines || []).map(function (L) {
         var row = el("div", "sl-line", beat);
         var span = el("span", "sl-text", row, L.t);
+        if (L.font === "brush") { span.style.fontFamily = '"Brush", sans-serif'; span.style.letterSpacing = "0.01em"; span.style.filter = "url(#brushTex)"; }
         span.style.fontSize = (L.size || 160) + "px";
         var fs = fitWidth(span, L.maxW || 980, 30);
         styleLine(span, L, bg, fs);
         fitWidth(span, L.maxW || 980, 30);
-        stack.push({ node: row, h: span.offsetHeight });
+        stack.push({ node: row, h: span.offsetHeight, space: L.space || 0 });
         return { L: L, row: row, span: span };
       });
       var gap = b.gap != null ? b.gap : 26;
-      var total = stack.reduce(function (a, s) { return a + s.h; }, 0) + gap * Math.max(0, stack.length - 1);
+      var total = stack.reduce(function (a, s) { return a + s.h + (s.space || 0); }, 0) + gap * Math.max(0, stack.length - 1);
       var y = (b.y || 960) - total / 2;
-      stack.forEach(function (s) { s.node.style.top = Math.round(y) + "px"; y += s.h + gap; });
+      stack.forEach(function (s) { y += s.space || 0; s.node.style.top = Math.round(y) + "px"; y += s.h + gap; });
       lines.forEach(function (o) { tl.set(o.span, { autoAlpha: 0 }, 0); });
       var end = start + 0.2;
       if (logoEl) {

@@ -16,7 +16,8 @@
      bg    = "dark" (plain black), "orange", "cream" or a colour code
      lines = t (text), size, colour, style ("outline" / "box"),
              in (slam, fromLeft, fromRight, stretch, zoom, flip, wipe, spin, rise, drop, type),
-             at (seconds after the beat starts)
+             at (seconds after the beat starts), space (extra gap above the line),
+             font ("brush" = same lettering as the food titles)
      ghost = giant faint word drifting behind   logo = "center" or "top"
      hold  = seconds to hold                    out  = whipL, whipR, up, down, zoom, fade, none
    ===================================================================== */
@@ -89,7 +90,7 @@ window.PROMO2 = {
           { t: "IS OUR", size: 220, colour: "black", in: "fromRight" },
           { t: "RECIPE.", size: 250, colour: "white", in: "slam", at: 0.4, shake: 1.3 } ] },
         { bg: "dark", logo: "center", hold: 1.6, out: "none", lines: [
-          { t: "QUALITY IS OUR RECIPE", size: 64, colour: "white", in: "type", at: 0.6 } ] }
+          { t: "QUALITY IS OUR RECIPE", size: 96, colour: "white", font: "brush", space: 90, in: "type", at: 0.6 } ] }
       ]
     },
     {
