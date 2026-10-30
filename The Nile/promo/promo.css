@@ -177,3 +177,27 @@ html, body {
   letter-spacing: 0.06em;
   color: #FF9A5C;
 }
+
+/* slogan slides */
+.bg-panel { position: absolute; top: -200px; left: 0; width: 1700px; height: 2320px; will-change: transform; }
+.beat { position: absolute; inset: 0; transform-origin: 50% 50%; perspective: 1200px; }
+.sl-line { position: absolute; left: 0; right: 0; text-align: center; }
+.sl-text {
+  display: inline-block;
+  white-space: nowrap;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  will-change: transform;
+}
+.ghost {
+  position: absolute; left: 0;
+  white-space: nowrap;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 900;
+  font-size: 560px;
+  line-height: 0.8;
+  letter-spacing: -0.03em;
+}
+.logo-center { top: auto; width: 760px; margin-left: -380px; padding: 34px 58px; border-radius: 44px; }

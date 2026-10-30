@@ -28,6 +28,7 @@
   // where the name, details and price sit (closer together when there are no details)
   function slots(p) {
     if (p.deal) return { titleY: 1390, detailsY: 1470, priceY: 1480 };
+    if (!p.price) return { titleY: 1450, detailsY: 1660, priceY: 1700 };   // name only, no price
     return p.details ? { titleY: 1392, detailsY: 1484, priceY: 1576 } : { titleY: 1420, detailsY: 1500, priceY: 1530 };
   }
   var NS = "http://www.w3.org/2000/svg";
@@ -101,6 +102,23 @@
     tl.set(target, { filter: "url(#" + id + ")" }, at);
     tl.fromTo(g, { attr: { stdDeviation: from } }, { attr: { stdDeviation: "0 0" }, duration: dur, ease: "power2.out", immediateRender: false }, at);
     tl.set(target, { filter: "none" }, at + dur);
+  }
+
+  function blurOut(tl, target, amount, dur, at, dir) {
+    if (!S.motionBlur || !amount) return;
+    var id = "mb" + (fxCount++);
+    var f = document.createElementNS(NS, "filter");
+    f.setAttribute("id", id);
+    f.setAttribute("x", "-25%"); f.setAttribute("y", "-25%");
+    f.setAttribute("width", "150%"); f.setAttribute("height", "150%");
+    var g = document.createElementNS(NS, "feGaussianBlur");
+    g.setAttribute("stdDeviation", "0 0");
+    f.appendChild(g);
+    defs.appendChild(f);
+    var to = dir === "y" ? "0 " + amount : dir === "xy" ? amount + " " + amount : amount + " 0";
+    tl.set(target, { filter: "url(#" + id + ")" }, at);
+    tl.fromTo(g, { attr: { stdDeviation: "0 0" } }, { attr: { stdDeviation: to }, duration: dur, ease: "power2.in", immediateRender: false }, at);
+    tl.set(target, { filter: "none" }, at + dur + 0.05);
   }
 
   /* ---------- building blocks ---------- */
@@ -178,7 +196,7 @@
     String(p.title || "").split("\n").forEach(function (t) {
       var row = el("div", "row", box);
       var line = el("span", "line", row, t);
-      line.style.fontSize = "74px";
+      line.style.fontSize = (p.titleSize || 74) + "px";
       fitWidth(line, 1000, 40);
       chars = chars.concat(splitChars(line));
     });
@@ -233,9 +251,14 @@
     return { box: b, val: big };
   }
   function offerBlock(sc, p, cx, y, size, maxW) {
-    if (p.deal) return dealBlock(sc, p, cx, y, maxW);
-    if (p.price) return priceBlock(sc, p, cx, y, size, maxW);
-    return null;
+    var pr = p.deal ? dealBlock(sc, p, cx, y, maxW) : p.price ? priceBlock(sc, p, cx, y, size, maxW) : null;
+    if (pr && p.mealPrice) {
+      // second price box: replaces the item price with "MAKE IT A MEAL" later in the same scene
+      sc.meal = priceBlock(sc, { priceLabel: p.mealLabel || "MAKE IT A MEAL", price: p.mealPrice }, cx, y, Math.min(size || 214, 200), maxW);
+      gsap.set(sc.meal.box, { autoAlpha: 0 });
+    }
+    sc.pr = pr;
+    return pr;
   }
 
   /* ---------- reusable moves ---------- */
@@ -452,6 +475,181 @@
     return { tl: tl, introEnd: 6.2 };
   };
 
+  /* ---------- slogan slides (words only, no food) ---------- */
+  var COLOURS = { white: "#ffffff", black: "#111111", orange: "#EE6A2E", cream: "#F7F3EE", dark: "#0E0E0E" };
+  function col(c) { return COLOURS[c] || c || "#ffffff"; }
+  function lum(hex) { var c = rgb(hex); return c[0] * 0.299 + c[1] * 0.587 + c[2] * 0.114; }
+
+  function buildSlogan(p) {
+    var sc = { p: p, slogan: true };
+    sc.root = el("section", "scene slogan", stage);
+    sc.root.style.background = col((p.beats[0] || {}).bg || "dark");
+    sc.bgs = el("div", "layer", sc.root);
+    sc.beatsBox = el("div", "layer", sc.root);
+    return sc;
+  }
+
+  function styleLine(span, L, bg, fs) {
+    var c = col(L.colour || (lum(bg) > 150 ? "black" : "white"));
+    var lb = lum(bg);
+    if (L.style === "outline") {
+      span.style.color = bg;                       // fill hides the inner glyph lines
+      span.style.webkitTextStroke = Math.max(6, Math.round(fs * 0.045)) + "px " + c;
+      span.style.paintOrder = "stroke fill";
+    } else if (L.style === "box") {
+      var bc = col(L.box || "orange");
+      span.style.background = bc;
+      span.style.color = c;
+      span.style.padding = "0.07em 0.24em 0.02em";
+      span.style.borderRadius = "0.07em";
+      span.style.boxShadow = "0 0.06em 0 " + mix(bc, "#000000", 0.45);
+    } else {
+      span.style.color = c;
+      if (lb > 60 && lb < 200) span.style.textShadow = extrude(mix(bg, "#000000", 0.38), Math.max(3, Math.round(fs * 0.03)), false);
+    }
+  }
+
+  function sloganLineIn(tl, sc, L, span, la) {
+    var fx = L.in || "slam", chars, n;
+    if (fx === "fromLeft" || fx === "fromRight") {
+      var dir = fx === "fromLeft" ? -1 : 1;
+      tl.fromTo(span, { autoAlpha: 1, x: dir * 1300 }, { x: 0, duration: 0.75, ease: "expo.out" }, la);
+      blur(tl, span, 60, 0.5, la);
+      return la + 0.6;
+    }
+    if (fx === "slam") {
+      tl.fromTo(span, { autoAlpha: 0, scale: 2.6 }, { autoAlpha: 1, scale: 1, duration: 0.36, ease: "power4.out" }, la);
+      blur(tl, span, 20, 0.3, la, "xy");
+      shake(tl, sc, la + 0.3, L.shake || 1);
+      return la + 0.4;
+    }
+    if (fx === "stretch") {
+      tl.fromTo(span, { autoAlpha: 0, scaleX: 3.2, scaleY: 0.7 }, { autoAlpha: 1, scaleX: 1, scaleY: 1, duration: 0.7, ease: "expo.out" }, la);
+      blur(tl, span, 70, 0.55, la);
+      return la + 0.6;
+    }
+    if (fx === "zoom") {
+      tl.fromTo(span, { autoAlpha: 0, scale: 0.12 }, { autoAlpha: 1, scale: 1, duration: 0.7, ease: "expo.out" }, la);
+      blur(tl, span, 16, 0.4, la, "xy");
+      return la + 0.6;
+    }
+    if (fx === "flip") {
+      tl.fromTo(span, { autoAlpha: 0, rotationX: -95, transformPerspective: 900, transformOrigin: "50% 100%" },
+        { autoAlpha: 1, rotationX: 0, duration: 0.7, ease: "back.out(1.6)" }, la);
+      return la + 0.6;
+    }
+    if (fx === "wipe") {
+      tl.fromTo(span, { autoAlpha: 1, clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.6, ease: "power3.inOut" }, la);
+      return la + 0.6;
+    }
+    if (fx === "spin") {
+      tl.fromTo(span, { autoAlpha: 0, scale: 0, rotation: -200 }, { autoAlpha: 1, scale: 1, rotation: L.tilt || 0, duration: 0.9, ease: "back.out(1.7)" }, la);
+      return la + 0.8;
+    }
+    // letter by letter
+    chars = splitChars(span); n = chars.length;
+    tl.set(span, { autoAlpha: 1 }, la);
+    if (fx === "rise") {
+      tl.fromTo(chars, { autoAlpha: 0, yPercent: 110, rotationX: -80 }, { autoAlpha: 1, yPercent: 0, rotationX: 0, duration: 0.6, ease: "power3.out", stagger: 0.04 }, la);
+      return la + 0.5 + 0.04 * n;
+    }
+    if (fx === "drop") {
+      tl.fromTo(chars, { autoAlpha: 0, y: -420 }, { autoAlpha: 1, y: 0, duration: 0.7, ease: "back.out(1.8)", stagger: 0.06 }, la);
+      blur(tl, span, 30, 0.5, la, "y");
+      return la + 0.55 + 0.06 * n;
+    }
+    tl.fromTo(chars, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01, stagger: 0.055 }, la);   // "type"
+    return la + 0.055 * n;
+  }
+
+  function sloganExit(tl, beat, kind, at) {
+    if (kind === "none") return 0;
+    var d = 0.38;
+    if (kind === "whipL" || kind === "whipR") {
+      tl.to(beat, { x: kind === "whipL" ? -1400 : 1400, duration: d, ease: "power3.in" }, at);
+      blurOut(tl, beat, 60, d, at);
+    } else if (kind === "up" || kind === "down") {
+      tl.to(beat, { y: kind === "up" ? -1500 : 1500, duration: d, ease: "power3.in" }, at);
+      blurOut(tl, beat, 40, d, at, "y");
+    } else if (kind === "zoom") {
+      d = 0.42;
+      tl.to(beat, { scale: 5, autoAlpha: 0, duration: d, ease: "power2.in" }, at);
+    } else {
+      d = 0.3;
+      tl.to(beat, { autoAlpha: 0, duration: d }, at);
+    }
+    tl.set(beat, { autoAlpha: 0 }, at + d + 0.02);
+    return d;
+  }
+
+  function sloganTimeline(sc, p) {
+    var tl = gsap.timeline();
+    var T = 0.45;                                   // starts as the screen is uncovered
+    var cur = col((p.beats[0] || {}).bg || "dark");
+    var side = 1;
+    p.beats.forEach(function (b) {
+      var bg = col(b.bg || cur), start = T;
+      if (bg !== cur) {                             // new background colour sweeps across
+        var panel = el("div", "bg-panel", sc.bgs);
+        panel.style.background = bg;
+        side = -side;
+        gsap.set(panel, { skewX: -14 });
+        tl.fromTo(panel, { x: side > 0 ? 1400 : -2050 }, { x: -310, duration: 0.55, ease: "power3.inOut" }, T - 0.25);
+        start = T + 0.25;
+        cur = bg;
+      }
+      var beat = el("div", "beat", sc.beatsBox);
+      tl.set(beat, { autoAlpha: 0 }, 0);
+      tl.set(beat, { autoAlpha: 1 }, start);
+
+      if (b.ghost) {                                // giant faint word drifting behind
+        var g = el("div", "ghost", beat, b.ghost);
+        g.style.color = lum(bg) > 150 ? "rgba(0,0,0,0.06)" : lum(bg) < 60 ? "rgba(255,255,255,0.06)" : mix(bg, "#000000", 0.12);
+        g.style.top = ((b.y || 960) - 250) + "px";
+        tl.fromTo(g, { x: 500 }, { x: -g.offsetWidth + 200, duration: 6, ease: "none" }, start);
+      }
+
+      // stack: optional centred logo, then the lines
+      var stack = [], logoEl = null;
+      if (b.logo === "center" || b.logo === "top") {
+        logoEl = el("div", "logo" + (b.logo === "center" ? " logo-center" : ""), beat);
+        var li = el("img", null, logoEl); li.src = S.logo; li.alt = "The Nile";
+        if (b.logo === "center") stack.push({ node: logoEl, h: logoEl.offsetHeight });
+      }
+      var lines = (b.lines || []).map(function (L) {
+        var row = el("div", "sl-line", beat);
+        var span = el("span", "sl-text", row, L.t);
+        span.style.fontSize = (L.size || 160) + "px";
+        var fs = fitWidth(span, L.maxW || 980, 30);
+        styleLine(span, L, bg, fs);
+        fitWidth(span, L.maxW || 980, 30);
+        if (L.dx) { row.style.left = L.dx + "px"; row.style.right = (-L.dx) + "px"; }
+        stack.push({ node: row, h: span.offsetHeight });
+        return { L: L, row: row, span: span };
+      });
+      var gap = b.gap != null ? b.gap : 26;
+      var total = stack.reduce(function (a, it) { return a + it.h; }, 0) + gap * Math.max(0, stack.length - 1);
+      var y = (b.y || 960) - total / 2;
+      stack.forEach(function (it) { it.node.style.top = Math.round(y) + "px"; y += it.h + gap; });
+
+      lines.forEach(function (o) { tl.set(o.span, { autoAlpha: 0 }, 0); });
+      var end = start + 0.2;
+      if (logoEl) {
+        tl.fromTo(logoEl, { autoAlpha: 0, scale: 0.6, y: -40 }, { autoAlpha: 1, scale: 1, y: 0, duration: 0.7, ease: "back.out(1.7)" }, start);
+        end = start + 0.6;
+      }
+      lines.forEach(function (o, i) {
+        var la = start + (o.L.at != null ? o.L.at : (logoEl ? 0.35 : 0) + i * 0.3);
+        end = Math.max(end, sloganLineIn(tl, sc, o.L, o.span, la));
+      });
+      var holdEnd = end + (b.hold != null ? b.hold : 1.0);
+      tl.fromTo(beat, { scale: 1 }, { scale: 1.04, duration: holdEnd - start, ease: "none" }, start);   // slow push-in
+      var d = sloganExit(tl, beat, b.out || "whipL", holdEnd);
+      T = holdEnd + d * 0.6;
+    });
+    return { tl: tl, introEnd: T + 0.15 };
+  }
+
   /* ---------- gentle movement while the final layout is held ---------- */
   function hold(tl, sc, p, at, dur) {
     if (dur <= 0) return;
@@ -507,20 +705,17 @@
   (CFG.promos || []).forEach(function (p) {
     if (p.enabled === false || (onlyId && p.id !== onlyId)) return;
     promos.push(p);
-    if (p.mealPrice) {   // second run of the same animation with the meal price
-      promos.push(Object.assign({}, p, { price: p.mealPrice, priceLabel: p.mealLabel || "MAKE IT A MEAL", meal: true }));
-    }
   });
   var fonts = ["900 100px Montserrat", "800 100px Montserrat", "600 40px 'Barlow Semi Condensed'"].map(function (f) {
     return document.fonts ? document.fonts.load(f) : Promise.resolve();
   });
-  var loads = promos.map(function (p) { return loadImage(p.image); }).concat([loadImage(S.logo)], fonts);
+  var loads = promos.filter(function (p) { return p.image; }).map(function (p) { return loadImage(p.image); }).concat([loadImage(S.logo)], fonts);
 
   Promise.all(loads).then(function () { return document.fonts ? document.fonts.ready : null; }).then(start);
 
   function start() {
     if (!promos.length) { console.warn("No enabled promotions in promos.js"); return; }
-    var scenes = promos.map(buildScene);
+    var scenes = promos.map(function (p) { return p.type === "slogan" ? buildSlogan(p) : buildScene(p); });
     var roots = scenes.map(function (s) { return s.root; });
     buildWipe();
 
@@ -534,22 +729,37 @@
         .catch(function () {});
     } });
 
-    var t = 0;
+    var t = 0, starts = [];
     scenes.forEach(function (sc) {
       var p = sc.p;
-      var make = styles[p.animation] || styles.sweep;
-      var built = make(sc, p);
-      var dur = Math.max(p.duration || 12, built.introEnd + 3);
+      starts.push({ id: p.id, at: t });
+      var built, dur;
+      if (sc.slogan) {
+        built = sloganTimeline(sc, p);
+        dur = Math.max(p.duration || 0, built.introEnd);
+      } else {
+        built = (styles[p.animation] || styles.sweep)(sc, p);
+        dur = Math.max(p.duration || 12, built.introEnd + 3 + (sc.meal ? 3.4 : 0));
+      }
       master.set(roots, { autoAlpha: 0 }, t);
       master.set(sc.root, { autoAlpha: 1 }, t);
       wipeOut(master, t);
       master.add(built.tl, t);
-      hold(master, sc, p, t + built.introEnd, dur - built.introEnd - 0.5);
+      if (!sc.slogan) hold(master, sc, p, t + built.introEnd, dur - built.introEnd - 0.5);
+      if (sc.meal) {                     // item price flips away, "MAKE IT A MEAL" price pops up
+        var m = t + built.introEnd + 1.9;
+        master.set(sc.meal.box, { autoAlpha: 0 }, t);
+        master.to(sc.pr.box, { rotationX: 90, y: -40, autoAlpha: 0, duration: 0.32, ease: "power2.in", transformPerspective: 900 }, m);
+        master.fromTo(sc.meal.box, { autoAlpha: 0, scale: 0.3, rotationX: -70, y: 70, transformPerspective: 900 },
+          { autoAlpha: 1, scale: 1, rotationX: 0, y: 0, duration: 0.95, ease: "back.out(2.4)", immediateRender: false }, m + 0.22);
+        master.fromTo(sc.meal.val, { scale: 1.3 }, { scale: 1, duration: 0.55, ease: "back.out(3)", immediateRender: false }, m + 0.57);
+        shake(master, sc, m + 0.5, 0.5);
+      }
       wipeIn(master, t + dur);
       t += dur;
     });
 
-    window.NILE_PROMO = { master: master, duration: t };
+    window.NILE_PROMO = { master: master, duration: t, starts: starts };
     if (freezeAt != null) master.pause(freezeAt);
     else if (!params.has("capture")) master.play(0);
     else master.pause(0);
