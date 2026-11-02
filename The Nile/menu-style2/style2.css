@@ -86,3 +86,6 @@
 .tag-p { color: #fff; }
 .info { color: var(--ink); }
 .info.small { color: var(--ink-soft); }
+
+/* screens 2 and 3 have no header band, so the corner pattern would sit behind the menu text – hide it there */
+.no-head .geo { display: none; }
