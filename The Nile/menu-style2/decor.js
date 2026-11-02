@@ -23,7 +23,7 @@
   // logo only on screen 1, centred; other screens get no header at all
   if (n === "1") {
     var h = el("div", "hdr", stage);
-    el("div", "brand", h, '<img src="../promo-v2/images/logo-triangle-dark.png" alt=""><div class="n">THE NILE</div><div class="o">ORIGINAL</div><div class="u"></div>');
+    el("div", "brand", h, '<img src="../promo-v2/images/logo-triangle-dark.png" alt=""><div class="n">THE NILE</div><div class="o">ORIGIN<img class="fl" src="../promo-v2/images/flame-small.png" alt="A">L</div><div class="u"></div>');
   } else {
     document.documentElement.classList.add("no-head");
   }
