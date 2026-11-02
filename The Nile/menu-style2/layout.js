@@ -3,14 +3,12 @@
    items and prices still come from ../menu-data.js. */
 window.MENU.screens = {
   1: [
-    // sections line up in rows: headings side by side
     "starters",
-    { left: ["burgers"], right: ["kebabs"], widths: "46fr 54fr" },
-    { left: ["steak"], right: ["chicken"], widths: "46fr 54fr" }
+    "pizzas",
+    "garlic"
   ],
   2: [
-    "pizzas",
-    "garlic",
+    { left: ["burgers", "steak"], right: ["kebabs", "chicken"], widths: "44fr 56fr" },
     "sides"
   ],
   3: [
