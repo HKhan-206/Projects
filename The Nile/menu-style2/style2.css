@@ -91,3 +91,6 @@
 .geo { z-index: 0; }
 #board { z-index: 2; }
 .hdr, .foot { z-index: 1; }
+
+/* allergy notice (preview, screen 2) */
+.allergy-note .info { font-family: "Montserrat", sans-serif; font-weight: 600; font-size: 0.72em; line-height: 1.35; color: var(--ink); text-wrap: pretty; }
