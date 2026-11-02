@@ -32,9 +32,12 @@ window.MENU.screens = {
 // screen 1 sizes itself. The allergy advice keeps its own size.
 window.PREVIEW_FS = { 2: 22.5, 3: 26.75 };
 
-// Side Orders: move Chilli Pepper Cheese Nuggets to the bottom of the left column
-// so both columns end at almost the same height (order is unchanged)
+// Side Orders: Chilli Pepper Cheese Nuggets and Mozzarella Cheese Sticks sit at the
+// bottom of the left column, with a small gap above them (gap added in decor.js)
 (function () {
   var c = window.MENU.sections.sides.columns;
   if (c && c[1].items[0][0] === "Chilli Pepper Cheese Nuggets") c[0].items.push(c[1].items.shift());
+  // Mozzarella Cheese Sticks goes under it, in the left column too
+  var i = c[1].items.findIndex(function (it) { return it[0] === "Mozzarella Cheese Sticks"; });
+  if (i >= 0) c[0].items.push(c[1].items.splice(i, 1)[0]);
 })();

@@ -48,6 +48,44 @@
     });
     var fixed = window.PREVIEW_FS && window.PREVIEW_FS[n];
     if (fixed) document.getElementById("board").style.setProperty("--fs", fixed + "px");
+    tweaks();
+  }
+
+  // ---- small spacing tweaks (preview only) ----
+  function panelByTitle(t) {
+    return Array.prototype.find.call(document.querySelectorAll(".panel"), function (p) {
+      var h = p.querySelector(".title"); return h && h.textContent.trim().toLowerCase() === t;
+    });
+  }
+  function rowCells(first) {        // the cells that make up the grid row starting at "first"
+    var cells = [first], top = first.offsetTop, el = first.nextElementSibling;
+    while (el && el.offsetTop === top && !el.classList.contains("name") && !el.classList.contains("blank")) { cells.push(el); el = el.nextElementSibling; }
+    return cells;
+  }
+  function gapAbove(cells, px) { cells.forEach(function (c) { c.style.marginTop = px + "px"; }); }   // margin keeps the orange header boxes their normal size
+  function nameCell(panel, text) {
+    return Array.prototype.find.call(panel.querySelectorAll(".name"), function (c) { return c.firstChild && c.firstChild.nodeValue === text; });
+  }
+  function tweaks() {
+    var fs = parseFloat(getComputedStyle(document.getElementById("board")).getPropertyValue("--fs")) || 22;
+    var sides = panelByTitle("side orders");
+    if (sides) {                     // small gap between the Reg/Lrg items and the Only/Meal items
+      var cp = nameCell(sides, "Chilli Pepper Cheese Nuggets");
+      if (cp) gapAbove(rowCells(cp), Math.round(fs * 0.9));
+    }
+    var keb = panelByTitle("kebabs");
+    if (keb) {                       // one row of space between Mix Kebab and the second Reg/Lrg/Meal row
+      var heads = keb.querySelectorAll(".items > .blank");
+      var mid = heads[heads.length - 1];
+      if (mid) gapAbove(rowCells(mid), Math.round(fs * 1.35));
+    }
+    var bur = panelByTitle("burgers");
+    if (keb && bur) {                // move Burgers down so Double/Triple lines up with Reg/Lrg in Kebabs
+      var kh = keb.querySelector(".head"), bh = bur.querySelector(".head");
+      var kTop = keb.querySelectorAll(".items > .blank")[1] || kh;   // the Reg/Lrg row (below Naan/Pitta)
+      var diff = kTop.getBoundingClientRect().top - bh.getBoundingClientRect().top;
+      if (diff > 0) bur.querySelector(".items").style.marginTop = diff + "px";
+    }
   }
   new MutationObserver(function (m, obs) {
     if (document.body.getAttribute("data-ready") === "1") { obs.disconnect(); finish(); }
