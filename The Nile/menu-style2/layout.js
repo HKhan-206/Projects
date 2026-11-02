@@ -3,12 +3,12 @@
    items and prices still come from ../menu-data.js. */
 window.MENU.screens = {
   1: [
-    "starters",
-    { left: ["burgers", "steak"], right: ["kebabs", "chicken"], widths: "44fr 56fr" },
-    "garlic"
+    // read the left column top to bottom, then the right
+    { left: ["starters", "burgers", "steak"], right: ["kebabs", "chicken"], widths: "46fr 54fr" }
   ],
   2: [
     "pizzas",
+    "garlic",
     "sides"
   ],
   3: [
@@ -17,3 +17,6 @@ window.MENU.screens = {
     { left: ["milkshakes"], right: ["cookie", "icecream", "slushes", "drinks"], widths: "46fr 54fr" }
   ]
 };
+
+// in this preview Starters sits in a narrow column, so show it as one list
+window.MENU.sections.starters.split = 1;
