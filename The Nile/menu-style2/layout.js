@@ -8,7 +8,9 @@ window.MENU.screens = {
     "garlic"
   ],
   2: [
-    { left: ["burgers", "steak"], right: ["kebabs", "chicken"], widths: "44fr 56fr" },
+    // three tidy rows, headings level with each other
+    { left: ["kebabs"], right: ["burgers"], widths: "56fr 44fr" },
+    { left: ["steak"], right: ["chicken"], widths: "46fr 54fr" },
     "sides"
   ],
   3: [
