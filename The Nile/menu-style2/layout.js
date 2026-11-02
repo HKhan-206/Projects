@@ -5,7 +5,7 @@
 window.MENU.sections.allergy = {
   title: "Allergy Advice",
   items: [],
-  info: ["Please tell a member of staff about any allergies before ordering. Our kitchen handles allergens including nuts, sesame, gluten, milk and eggs, so we cannot guarantee any dish is allergen-free."]
+  info: ["Please tell a member of staff about any allergies before ordering. Our food is prepared in a kitchen that handles all 14 major allergens, including nuts, sesame, gluten, milk and eggs, so we cannot guarantee any dish is allergen-free."]
 };
 
 window.MENU.screens = {
