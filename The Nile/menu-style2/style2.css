@@ -92,5 +92,6 @@
 #board { z-index: 2; }
 .hdr, .foot { z-index: 1; }
 
-/* allergy notice (preview, screen 2) */
+/* allergy notice (preview, screen 2) – fixed size, not scaled with the menu */
+.allergy-note { font-size: 23px; }
 .allergy-note .info { font-family: "Montserrat", sans-serif; font-weight: 600; font-size: 0.72em; line-height: 1.35; color: var(--ink); text-wrap: pretty; }

@@ -16,7 +16,7 @@ window.MENU.screens = {
   ],
   2: [
     // three tidy rows, headings level with each other
-    { left: ["kebabs"], right: ["burgers"], widths: "56fr 44fr" },
+    { left: ["kebabs"], right: ["burgers"], widths: "53fr 47fr" },
     { left: ["steak"], right: ["chicken"], widths: "46fr 54fr" },
     "sides",
     "allergy"
@@ -27,3 +27,7 @@ window.MENU.screens = {
     { left: ["milkshakes"], right: ["cookie", "icecream", "slushes", "drinks"], widths: "46fr 54fr" }
   ]
 };
+
+// fixed text size for screen 2 (a few long names wrap onto two lines);
+// the allergy advice keeps its own size
+window.PREVIEW_FS = { 2: 25 };

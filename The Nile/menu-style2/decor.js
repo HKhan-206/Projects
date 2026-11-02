@@ -40,11 +40,16 @@
   terr.innerHTML = chips;
   el("div", "wood", f);
   [70, 250, 520, 800, 980].forEach(function (x, i) { var b = el("div", "bar", f); b.style.left = x + "px"; b.style.height = (i % 2 ? 84 : 60) + "px"; });
-  // tag the allergy panel for styling once the menu has been drawn
-  window.addEventListener("load", function () {
+  // once the menu has been drawn: tag the allergy panel and apply any fixed text size
+  function finish() {
     document.querySelectorAll(".panel").forEach(function (p) {
       var t = p.querySelector(".title");
       if (t && /allergy/i.test(t.textContent)) p.classList.add("allergy-note");
     });
-  });
+    var fixed = window.PREVIEW_FS && window.PREVIEW_FS[n];
+    if (fixed) document.getElementById("board").style.setProperty("--fs", fixed + "px");
+  }
+  new MutationObserver(function (m, obs) {
+    if (document.body.getAttribute("data-ready") === "1") { obs.disconnect(); finish(); }
+  }).observe(document.body, { attributes: true, attributeFilter: ["data-ready"] });
 })();
