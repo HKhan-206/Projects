@@ -181,11 +181,11 @@ window.MENU = {
       title: "Chicken",
       cols: 2,           // items with more prices continue on a second line
       items: [
-        ["Chicken Tikka Wrap", { l: "Only", p: "3.99" }, { l: "Meal", p: "5.99" }],
+        ["Peri Chicken and Chips", { l: "Reg", p: "7.50" }, { l: "Lrg", p: "9.49" }],
         ["Chicken Tikka and Chips", { l: "Reg", p: "6.99" }, { l: "Lrg", p: "8.98" }],
         ["Chicken Tikka and Rice", { l: "Reg", p: "7.00" }, { l: "Lrg", p: "8.99" }],
         ["Chicken Tikka and Spirals", { l: "Reg", p: "7.50" }, { l: "Lrg", p: "9.50" }],
-        ["Peri Chicken and Chips", { l: "Reg", p: "7.50" }, { l: "Lrg", p: "9.49" }],
+        ["Chicken Tikka Wrap", { l: "Only", p: "3.99" }, { l: "Meal", p: "5.99" }],
         ["Chicken Wrap", { l: "Only", p: "3.79" }, { l: "Meal", p: "5.79" }],
         ["Chicken Nuggets", { l: "Only", p: "3.49" }, { l: "Meal", p: "5.98" }],
         ["Hot and Spicy Wings", { l: "Only", p: "3.49" }, { l: "Meal", p: "5.49" }],
