@@ -1,0 +1,89 @@
+/* PREVIEW ONLY – an alternative look for the menu screens (cream + burnt orange).
+   Loaded after ../board.css, so it only overrides colours, fonts and decoration.
+   The menu content itself still comes from ../menu-data.js. */
+
+@font-face { font-family: "Montserrat"; font-weight: 900; src: url(../fonts/montserrat-latin-900-normal.woff2) format("woff2"); }
+
+:root {
+  --ink: #1c1712;
+  --ink-soft: rgba(28, 23, 18, 0.62);
+  --rule: rgba(28, 23, 18, 0.13);
+  --accent: #C4602B;          /* burnt orange */
+  --cream: #F3EEE7;
+  --safe: 42px;
+  --gap: 26px;
+  --head: 250px;              /* header band height */
+  --foot: 120px;              /* decorative floor strip */
+}
+
+#stage {
+  background: var(--cream);
+  background-image:
+    radial-gradient(130% 80% at 85% 0%, rgba(255,255,255,0.7), rgba(255,255,255,0) 60%);
+  color: var(--ink);
+}
+.mark { display: none; }
+
+#board {
+  top: calc(var(--head) + 6px);
+  bottom: calc(var(--foot) + 22px);
+  left: 52px; right: 52px;
+}
+
+/* subtle embossed geometric pattern, top right */
+.geo { position: absolute; right: 0; top: 0; width: 760px; height: 250px; opacity: 0.6; pointer-events: none;
+  -webkit-mask-image: linear-gradient(to left, #000 40%, transparent 100%); mask-image: linear-gradient(to left, #000 40%, transparent 100%); }
+
+/* header band: logo + food photo on an orange block */
+.hdr { position: absolute; left: 0; right: 0; top: 0; height: var(--head); }
+.hdr .brand { position: absolute; left: 60px; top: 36px; width: 520px; text-align: center; }
+.hdr .brand img { width: 120px; height: auto; display: block; margin: 0 auto 10px; }
+.hdr .brand .n { font-family: "Montserrat", sans-serif; font-weight: 800; font-size: 58px; letter-spacing: 0.32em; padding-left: 0.32em; color: var(--ink); line-height: 1; }
+.hdr .brand .o { font-family: "Montserrat", sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 0.5em; padding-left: 0.5em; color: var(--ink); margin-top: 12px; }
+.hdr .brand .u { width: 200px; height: 4px; background: var(--accent); margin: 14px auto 0; }
+.hdr .block { position: absolute; right: 0; top: 46px; width: 300px; height: 190px; background: var(--accent); }
+.hdr .food { position: absolute; right: 28px; top: 8px; width: 430px; height: 230px; object-fit: contain; object-position: center bottom;
+  filter: drop-shadow(0 18px 18px rgba(60, 25, 5, 0.32)); }
+
+/* floor strip: wood + terrazzo + orange bars, like the reference */
+.foot { position: absolute; left: 0; right: 0; bottom: 0; height: var(--foot); overflow: hidden; }
+.foot .wood { position: absolute; inset: 0; top: 46px;
+  background: repeating-linear-gradient(90deg, #8a6a52 0 3px, #7b5c46 3px 70px, #866650 70px 74px, #73543f 74px 140px); }
+.foot .terr { position: absolute; left: 0; right: 0; top: 0; height: 46px; background-color: #ece6de; }
+.foot .bar { position: absolute; bottom: 0; width: 26px; background: var(--accent); }
+
+/* section titles: wide-spaced black caps with a short orange underline */
+.title {
+  font-family: "Montserrat", sans-serif; font-weight: 800;
+  font-size: 1.28em; letter-spacing: 0.22em;
+  color: var(--ink);
+  display: block; margin-bottom: 0.32em; padding-bottom: 0.22em;
+  position: relative;
+}
+.title::after {
+  content: ""; position: absolute; left: 0; bottom: 0;
+  width: 3.4em; height: 3px; background: var(--accent); flex: none;
+}
+
+.name { font-family: "Montserrat", sans-serif; font-weight: 700; font-size: 0.86em; letter-spacing: 0; color: var(--ink); }
+.price { font-family: "Montserrat", sans-serif; font-weight: 800; font-size: 0.9em; color: var(--ink); }
+.price .lbl { color: var(--accent); }
+.desc { color: var(--ink-soft); font-family: "Barlow Semi Condensed", sans-serif; }
+.list { color: var(--ink-soft); }
+
+/* column headings as orange tabs (like 10" 12" 14") */
+.head {
+  background: var(--accent); color: #fff;
+  font-size: 0.56em; font-weight: 800;
+  justify-content: center; padding: 0.35em 0.6em; margin-left: 2px;
+  border-bottom-color: transparent;
+}
+.blank { border-bottom-color: transparent; }
+.group { color: var(--accent); }
+.group span { border-bottom-color: var(--accent); }
+
+/* add-on tags */
+.tag { background: var(--accent); color: #fff; border-radius: 4px; }
+.tag-p { color: #fff; }
+.info { color: var(--ink); }
+.info.small { color: var(--ink-soft); }
