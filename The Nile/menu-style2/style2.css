@@ -12,8 +12,8 @@
   --cream: #F3EEE7;
   --safe: 42px;
   --gap: 26px;
-  --head: 250px;              /* header band height */
-  --foot: 120px;              /* decorative floor strip */
+  --head: 230px;              /* header band height (screen 1 only) */
+  --foot: 84px;               /* decorative floor strip */
 }
 
 #stage {
@@ -36,20 +36,19 @@
 
 /* header band: logo + food photo on an orange block */
 .hdr { position: absolute; left: 0; right: 0; top: 0; height: var(--head); }
-.hdr .brand { position: absolute; left: 60px; top: 36px; width: 520px; text-align: center; }
-.hdr .brand img { width: 120px; height: auto; display: block; margin: 0 auto 10px; }
+.hdr .brand { position: absolute; left: 0; right: 0; top: 30px; text-align: center; }
+.hdr .brand img { width: 112px; height: auto; display: block; margin: 0 auto 10px; }
 .hdr .brand .n { font-family: "Montserrat", sans-serif; font-weight: 800; font-size: 58px; letter-spacing: 0.32em; padding-left: 0.32em; color: var(--ink); line-height: 1; }
 .hdr .brand .o { font-family: "Montserrat", sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 0.5em; padding-left: 0.5em; color: var(--ink); margin-top: 12px; }
 .hdr .brand .u { width: 200px; height: 4px; background: var(--accent); margin: 14px auto 0; }
-.hdr .block { position: absolute; right: 0; top: 46px; width: 300px; height: 190px; background: var(--accent); }
-.hdr .food { position: absolute; right: 28px; top: 8px; width: 430px; height: 230px; object-fit: contain; object-position: center bottom;
-  filter: drop-shadow(0 18px 18px rgba(60, 25, 5, 0.32)); }
+/* screens 2 and 3: no header, menu starts near the top */
+.no-head { --head: 22px; }
 
 /* floor strip: wood + terrazzo + orange bars, like the reference */
 .foot { position: absolute; left: 0; right: 0; bottom: 0; height: var(--foot); overflow: hidden; }
-.foot .wood { position: absolute; inset: 0; top: 46px;
+.foot .wood { position: absolute; inset: 0; top: 34px;
   background: repeating-linear-gradient(90deg, #8a6a52 0 3px, #7b5c46 3px 70px, #866650 70px 74px, #73543f 74px 140px); }
-.foot .terr { position: absolute; left: 0; right: 0; top: 0; height: 46px; background-color: #ece6de; }
+.foot .terr { position: absolute; left: 0; right: 0; top: 0; height: 34px; background-color: #ece6de; }
 .foot .bar { position: absolute; bottom: 0; width: 26px; background: var(--accent); }
 
 /* section titles: wide-spaced black caps with a short orange underline */
@@ -65,8 +64,8 @@
   width: 3.4em; height: 3px; background: var(--accent); flex: none;
 }
 
-.name { font-family: "Montserrat", sans-serif; font-weight: 700; font-size: 0.86em; letter-spacing: 0; color: var(--ink); }
-.price { font-family: "Montserrat", sans-serif; font-weight: 800; font-size: 0.9em; color: var(--ink); }
+.name { font-family: "Montserrat", sans-serif; font-weight: 700; font-size: 0.8em; letter-spacing: -0.015em; color: var(--ink); }
+.price { font-family: "Montserrat", sans-serif; font-weight: 800; font-size: 0.85em; color: var(--ink); }
 .price .lbl { color: var(--accent); }
 .desc { color: var(--ink-soft); font-family: "Barlow Semi Condensed", sans-serif; }
 .list { color: var(--ink-soft); }

@@ -2,7 +2,6 @@
 (function () {
   var stage = document.getElementById("stage");
   var n = String(window.SCREEN || 1);
-  var foods = { "1": "../promo/images/chicken-tikka-pizza.png", "2": "../promo/images/hot-mexican-burger.png", "3": "../promo/images/milkshake.png" };
   function el(tag, cls, parent, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; parent.appendChild(e); return e; }
 
   // embossed line pattern built from the logo's triangle shape
@@ -21,10 +20,13 @@
   svg.innerHTML = g + "</g>";
   stage.appendChild(svg);
 
-  var h = el("div", "hdr", stage);
-  el("div", "block", h);
-  var im = el("img", "food", h); im.src = foods[n]; im.alt = "";
-  el("div", "brand", h, '<img src="../promo-v2/images/logo-triangle.png" alt="" style="filter:brightness(0.12)"><div class="n">THE NILE</div><div class="o">ORIGINAL</div><div class="u"></div>');
+  // logo only on screen 1, centred; other screens get no header at all
+  if (n === "1") {
+    var h = el("div", "hdr", stage);
+    el("div", "brand", h, '<img src="../promo-v2/images/logo-triangle-dark.png" alt=""><div class="n">THE NILE</div><div class="o">ORIGINAL</div><div class="u"></div>');
+  } else {
+    document.documentElement.classList.add("no-head");
+  }
 
   var f = el("div", "foot", stage);
   var terr = el("div", "terr", f);
@@ -33,9 +35,9 @@
   var seed = 7; function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
   for (var i = 0; i < 160; i++) {
     var col = ["#c4602b", "#2a2420", "#9d9389", "#ffffff"][Math.floor(rnd() * 4)];
-    chips += '<span style="position:absolute;left:' + (rnd() * 1080).toFixed(0) + 'px;top:' + (rnd() * 40).toFixed(0) + 'px;width:' + (3 + rnd() * 9).toFixed(0) + 'px;height:' + (3 + rnd() * 6).toFixed(0) + 'px;border-radius:40%;background:' + col + ';transform:rotate(' + (rnd() * 180).toFixed(0) + 'deg)"></span>';
+    chips += '<span style="position:absolute;left:' + (rnd() * 1080).toFixed(0) + 'px;top:' + (rnd() * 28).toFixed(0) + 'px;width:' + (3 + rnd() * 9).toFixed(0) + 'px;height:' + (3 + rnd() * 6).toFixed(0) + 'px;border-radius:40%;background:' + col + ';transform:rotate(' + (rnd() * 180).toFixed(0) + 'deg)"></span>';
   }
   terr.innerHTML = chips;
   el("div", "wood", f);
-  [70, 250, 520, 800, 980].forEach(function (x, i) { var b = el("div", "bar", f); b.style.left = x + "px"; b.style.height = (i % 2 ? 120 : 84) + "px"; });
+  [70, 250, 520, 800, 980].forEach(function (x, i) { var b = el("div", "bar", f); b.style.left = x + "px"; b.style.height = (i % 2 ? 84 : 60) + "px"; });
 })();
