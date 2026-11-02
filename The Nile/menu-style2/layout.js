@@ -30,7 +30,7 @@ window.MENU.screens = {
 
 // fixed text sizes: screens 2 and 3 as large as fits (a few long names wrap);
 // screen 1 sizes itself. The allergy advice keeps its own size.
-window.PREVIEW_FS = { 2: 22.5, 3: 26.75 };
+window.PREVIEW_FS = { 2: 22.5, 3: 26 };
 
 // Side Orders: Chilli Pepper Cheese Nuggets and Mozzarella Cheese Sticks sit at the
 // bottom of the left column, with a small gap above them (gap added in decor.js)
