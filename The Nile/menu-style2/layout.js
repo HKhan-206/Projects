@@ -28,7 +28,6 @@ window.MENU.screens = {
   ]
 };
 
-// fixed text sizes: screen 2 as large as fits (a few long names wrap),
-// screen 3 as large as possible with no names wrapping; screen 1 sizes itself.
-// The allergy advice keeps its own size.
-window.PREVIEW_FS = { 2: 22.5, 3: 22.25 };
+// fixed text sizes: screens 2 and 3 as large as fits (a few long names wrap);
+// screen 1 sizes itself. The allergy advice keeps its own size.
+window.PREVIEW_FS = { 2: 22.5, 3: 26.75 };
