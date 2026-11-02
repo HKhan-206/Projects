@@ -31,3 +31,10 @@ window.MENU.screens = {
 // fixed text sizes: screens 2 and 3 as large as fits (a few long names wrap);
 // screen 1 sizes itself. The allergy advice keeps its own size.
 window.PREVIEW_FS = { 2: 22.5, 3: 26.75 };
+
+// Side Orders: move Chilli Pepper Cheese Nuggets to the bottom of the left column
+// so both columns end at almost the same height (order is unchanged)
+(function () {
+  var c = window.MENU.sections.sides.columns;
+  if (c && c[1].items[0][0] === "Chilli Pepper Cheese Nuggets") c[0].items.push(c[1].items.shift());
+})();
