@@ -38,7 +38,7 @@
 .hdr { position: absolute; left: 0; right: 0; top: 0; height: var(--head); }
 .hdr .brand { position: absolute; left: 0; right: 0; top: 30px; text-align: center; }
 .hdr .brand img { width: 112px; height: auto; display: block; margin: 0 auto 10px; }
-.hdr .brand .n { font-family: "Montserrat", sans-serif; font-weight: 800; font-size: 58px; letter-spacing: 0.32em; padding-left: 0.32em; color: #EA6D4D; line-height: 1; }   /* logo orange */
+.hdr .brand .n { font-family: "Montserrat", sans-serif; font-weight: 800; font-size: 58px; letter-spacing: 0.32em; padding-left: 0.32em; color: var(--ink); line-height: 1; }
 .hdr .brand .o .fl { display: inline-block; width: auto; height: 1.3em; margin: 0 0.42em -0.16em 0; vertical-align: baseline; }   /* flame in place of the A */
 .hdr .brand .o { font-family: "Montserrat", sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 0.5em; padding-left: 0.5em; color: var(--ink); margin-top: 12px; }
 .hdr .brand .u { width: 200px; height: 4px; background: var(--accent); margin: 14px auto 0; }
