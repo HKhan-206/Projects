@@ -22,20 +22,20 @@
   }
 
   var shakeSrc = params.has("standin") ? "source/STANDIN-milkshake-preview-only.png" : C.milkshake.src;
-  Promise.all([loadSeq(C.strawberry), loadSeq(C.syrup), loadImg(shakeSrc)].concat(C.pieces.map(function (p) { return loadImg(p.src); })), document.fonts.load("150px Brush"))
+  Promise.all([loadSeq(C.strawberry), loadSeq(C.splash), loadImg(shakeSrc)].concat(C.pieces.map(function (p) { return loadImg(p.src); })), document.fonts.load("150px Brush"))
     .then(function (r) { build(r[0], r[1], r[2], r.slice(3, 3 + C.pieces.length)); });
 
   function build(sbFrames, syFrames, shakeImg, pieceImgs) {
     var sbCtx = document.getElementById("strawberry").getContext("2d");
-    var syCtx = document.getElementById("syrup").getContext("2d");
+    var syCtx = document.getElementById("splash").getContext("2d");
     var state = { sb: 0, sy: 0 };
 
     // a frame sequence is drawn by index; frames are 1076x1924 – scaled to fill 1080x1920
-    function drawSeq(ctx, frames, idx, cutoff) {
+    function drawSeq(ctx, frames, idx, cutoff, offsetY) {
       ctx.clearRect(0, 0, W, H);
       var f = frames[Math.max(0, Math.min(frames.length - 1, Math.round(idx)))];
       if (!f) return;
-      ctx.drawImage(f, -2, -2, W + 4, H + 4);
+      ctx.drawImage(f, -2, -2 + (offsetY || 0), W + 4, H + 4);
       if (cutoff) {   // fade the long drips out above the title area's lower edge
         ctx.globalCompositeOperation = "destination-out";
         var g = ctx.createLinearGradient(0, cutoff - 120, 0, cutoff + 40);
@@ -55,7 +55,10 @@
     var host = document.getElementById("pieces");
     var pieces = C.pieces.map(function (p, i) {
       var el = document.createElement("img"); el.className = "piece"; el.src = pieceImgs[i] ? pieceImgs[i].src : p.src;
-      el.style.width = p.width + "px"; el.style.left = p.x + "px"; el.style.top = p.y + "px"; host.appendChild(el); return el;
+      el.style.width = p.width + "px"; el.style.left = p.x + "px"; el.style.top = p.y + "px";
+      if (p.blur) el.style.filter = "blur(" + p.blur + "px) drop-shadow(0 10px 10px rgba(0,70,60,.22))";
+      if (p.flip) el.style.scale = "-1 1";
+      host.appendChild(el); return el;
     });
 
     // title letters
@@ -64,13 +67,13 @@
     C.title.lines.forEach(function (t) {
       var line = document.createElement("span"); line.className = "line"; title.appendChild(line);
       Array.from(t).forEach(function (c) { var s = document.createElement("span"); s.className = "ch"; s.textContent = c; line.appendChild(s); chars.push(s); });
-      var fs = 170; line.style.fontSize = fs + "px";
+      var fs = C.title.size || 150; line.style.fontSize = fs + "px";
       function w() { var t = 0; line.querySelectorAll(".ch").forEach(function (c) { t += c.getBoundingClientRect().width; }); return t; }
       while (w() > 980 && fs > 60) { fs -= 4; line.style.fontSize = fs + "px"; }
     });
 
     var tl = gsap.timeline({ repeat: -1, paused: true, onUpdate: function () {
-      drawSeq(sbCtx, sbFrames, state.sb); drawSeq(syCtx, syFrames, state.sy, C.syrup.cutoff);
+      drawSeq(sbCtx, sbFrames, state.sb, 0, C.strawberry.offsetY); drawSeq(syCtx, syFrames, state.sy, 0, C.splash.offsetY);
     } });
 
     // 1. strawberry falls (Higgsfield clip)
@@ -78,13 +81,9 @@
     // 2. milkshake rises in at an angle, overshoots, settles
     tl.fromTo(shake, { y: 1300, rotation: M.angle - 14, scale: 0.9 }, { y: -40, rotation: M.angle + 3, scale: 1.02, duration: 0.85, ease: "power3.out" }, M.enterAt);
     tl.to(shake, { y: 0, rotation: M.angle, scale: 1, duration: 0.6, ease: "sine.inOut" }, M.enterAt + 0.85);
-    // 3. syrup drips from the top (Higgsfield clip)
-    var syCan = document.getElementById("syrup");
+    // 3. strawberry sauce sweeps in from the sides at the bottom (Higgsfield clip)
     tl.set(state, { sy: 0 }, 0);
-    tl.set(syCan, { autoAlpha: 0, y: -720 }, 0);
-    tl.set(syCan, { autoAlpha: 1 }, C.syrup.start);
-    tl.to(syCan, { y: 0, duration: 0.9, ease: "power2.out" }, C.syrup.start);   // pours in from the top edge
-    tl.fromTo(state, { sy: 0 }, { sy: syFrames.length - 1, duration: C.syrup.end - C.syrup.start, ease: "sine.out" }, C.syrup.start);
+    tl.fromTo(state, { sy: 0 }, { sy: syFrames.length - 1, duration: C.splash.end - C.splash.start, ease: "none" }, C.splash.start);
     // 4. cut strawberries slide in from the sides
     C.pieces.forEach(function (p, i) {
       var dx = p.from === "left" ? -500 : 500;
@@ -102,8 +101,8 @@
     // 6. gentle float while it holds
     tl.to(shake, { y: -18, rotation: M.angle + 1.5, duration: 2.2, ease: "sine.inOut", yoyo: true, repeat: 1 }, M.enterAt + 1.6);
     // 7. everything fades back to the plain background so the loop restarts cleanly
-    tl.to([shake, title, host, "#strawberry", "#syrup"], { autoAlpha: 0, duration: 0.45, ease: "power1.in" }, C.duration - 0.5);
-    tl.set([shake, title, host, "#strawberry", "#syrup"], { autoAlpha: 1 }, C.duration);
+    tl.to([shake, title, host, "#strawberry", "#splash"], { autoAlpha: 0, duration: 0.45, ease: "power1.in" }, C.duration - 0.5);
+    tl.set([shake, title, host, "#strawberry", "#splash"], { autoAlpha: 1 }, C.duration);
     tl.set(pieces, { x: -2000 }, C.duration);
 
     window.PROMO_TL = tl;
