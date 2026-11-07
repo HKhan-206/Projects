@@ -12,15 +12,17 @@ window.PROMO = {
   milkshake: {
     src: "source/milkshake.png",
     width: 520,                       // on-screen width in pixels
-    centreX: 560, bottom: 1560,       // it settles resting on the strawberry, like the reference
+    centreX: 560, bottom: 1640,       // it settles resting on the strawberry, like the reference
     angle: -10,                       // tilt in degrees, like the reference
     enterAt: 1.5
   },
 
   // Higgsfield clips, keyed onto transparent frame sequences (layers/...)
   // offsetY moves a whole clip down; the strawberry ends large at the bottom, partly off-screen
-  strawberry: { frames: "layers/strawberry/f%04d.png", count: 151, from: 1, to: 130, start: 0, end: 2.6, offsetY: 330 },
+  strawberry: { frames: "layers/strawberry/f%04d.png", count: 151, from: 1, to: 130, start: 0, end: 2.6, offsetY: 470 },
   splash:     { frames: "layers/splash/f%04d.png",     count: 151, from: 1, to: 151, start: 1.9, end: 5.6, offsetY: 120 },
+  // continuation clip: starts on the splash's last frame, so the sauce never stops moving
+  splashLoop: { frames: "layers/splash-loop/f%04d.png", from: 2, to: 140, start: 5.6, end: 10 },
 
   // small strawberry halves (all the same half, flipped and rotated) – subtle, like the mango pieces
   pieces: [
