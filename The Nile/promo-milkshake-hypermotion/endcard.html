@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Nile – milkshake end card</title>
+<style>
+  @font-face { font-family: "Montserrat"; font-weight: 900; src: url(fonts/montserrat-latin-900-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Montserrat"; font-weight: 800; src: url(fonts/montserrat-latin-800-normal.woff2) format("woff2"); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+  #stage { position: absolute; left: 50%; top: 50%; width: 1080px; height: 1920px; overflow: hidden; transform-origin: center; }
+  .fill { position: absolute; inset: 0; }
+  #rays { position: absolute; left: 50%; top: 58%; width: 3000px; height: 3000px; margin: -1500px 0 0 -1500px; opacity: 0;
+    background: repeating-conic-gradient(rgba(255,255,255,0.55) 0deg 7deg, rgba(255,255,255,0) 7deg 18deg);
+    -webkit-mask-image: radial-gradient(circle, #000 0%, #000 22%, transparent 62%); mask-image: radial-gradient(circle, #000 0%, #000 22%, transparent 62%); }
+  #blobA, #blobB { position: absolute; border-radius: 50%; filter: blur(60px); }
+  #shadow { position: absolute; left: 50%; width: 520px; height: 70px; margin-left: -260px; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(110,30,30,0.32), rgba(110,30,30,0)); }
+  #cup { position: absolute; will-change: transform; filter: drop-shadow(0 30px 40px rgba(100, 25, 25, 0.22)); }
+  .half { position: absolute; will-change: transform; filter: drop-shadow(0 14px 16px rgba(100, 25, 25, 0.25)); }
+  #title { position: absolute; left: 0; right: 0; top: 96px; text-align: center; font-family: "Montserrat", sans-serif; font-weight: 900; }
+  .mask { display: block; overflow: hidden; line-height: 0.98; padding: 0 20px; }
+  .ln { display: inline-block; letter-spacing: -0.02em; will-change: transform; }
+  #headline { font-weight: 800; letter-spacing: 0.08em; font-size: 40px; margin-bottom: 14px; }
+  #banner { display: inline-block; margin-top: 12px; padding: 6px 34px 10px; border-radius: 18px; transform-origin: 50% 50%; }
+  #banner .ln { letter-spacing: 0.01em; }
+  #phrase { font-weight: 800; font-size: 40px; margin-top: 20px; }
+  #price { position: absolute; right: 70px; top: 1030px; width: 230px; height: 230px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-family: "Montserrat", sans-serif; font-weight: 900; font-size: 66px; transform: rotate(-8deg); }
+  #logo { position: absolute; left: 50%; bottom: 46px; transform: translateX(-50%); background: #0d0d0d; border-radius: 26px; padding: 18px 34px;
+    box-shadow: 0 16px 34px rgba(60, 10, 10, 0.25); }
+  #logo img { display: block; width: 420px; height: auto; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="fill" id="bg"></div>
+  <div id="blobA"></div><div id="blobB"></div>
+  <div id="rays"></div>
+  <div class="fill" id="glow"></div>
+  <div id="halves"></div>
+  <div id="shadow"></div>
+  <img id="cup" src="assets/milkshake-original.png" alt="Strawberry Millions Milkshake">
+  <div id="title"></div>
+  <div id="price"></div>
+  <div id="logo"><img src="assets/nile-logo.png" alt="The Nile"></div>
+</div>
+<script src="gsap.min.js"></script>
+<script src="endcard.config.js"></script>
+<script>
+(function () {
+  "use strict";
+  var E = window.ENDCARD, C = E.colours, W = 1080, H = 1920, D = E.duration;
+  var q = new URLSearchParams(location.search), stage = document.getElementById("stage");
+  function fit() { var k = Math.min(innerWidth / W, innerHeight / H); stage.style.transform = "translate(-50%,-50%) scale(" + k + ")"; }
+  fit(); addEventListener("resize", fit);
+  function $(id) { return document.getElementById(id); }
+
+  // background: soft pink studio sweep that matches the end of the Higgsfield clip
+  $("bg").style.background = "linear-gradient(180deg," + C.bgTop + " 0%," + C.bgBottom + " 100%)";
+  $("glow").style.background = "radial-gradient(60% 38% at 50% 52%," + C.glow + ", rgba(255,255,255,0) 72%)";
+  Object.assign($("blobA").style, { width: "700px", height: "700px", left: "-260px", top: "220px", background: "rgba(232,120,130,0.30)" });
+  Object.assign($("blobB").style, { width: "760px", height: "760px", left: "620px", top: "1100px", background: "rgba(255,200,190,0.45)" });
+
+  // title, built from text – nothing is AI lettering
+  var title = $("title"), lines = [];
+  function addLine(text, cls, size, colour) {
+    var m = document.createElement("span"); m.className = "mask";
+    var s = document.createElement("span"); s.className = "ln"; s.textContent = text; s.style.fontSize = size + "px"; s.style.color = colour;
+    m.appendChild(s); (cls || title).appendChild(m); lines.push(s); return s;
+  }
+  if (E.headline) { var h = addLine(E.headline, null, 40, C.redDark); h.parentNode.id = "headline"; }
+  E.productLines.forEach(function (t) { addLine(t, null, 124, C.red); });
+  var banner = document.createElement("span"); banner.id = "banner"; banner.style.background = C.red;
+  var bm = document.createElement("span"); bm.className = "mask"; bm.style.padding = "0";
+  var bt = document.createElement("span"); bt.className = "ln"; bt.textContent = E.productBanner; bt.style.fontSize = "112px"; bt.style.color = C.cream;
+  bm.appendChild(bt); banner.appendChild(bm);
+  var bwrap = document.createElement("span"); bwrap.className = "mask"; bwrap.style.overflow = "visible"; bwrap.appendChild(banner); title.appendChild(bwrap);
+  if (E.phrase) { var p = addLine(E.phrase, null, 40, C.redDark); p.parentNode.id = "phrase"; }
+  // shrink any line that is too wide
+  title.querySelectorAll(".ln").forEach(function (l) { var fs = parseFloat(l.style.fontSize); while (l.getBoundingClientRect().width > 960 && fs > 30) { fs -= 2; l.style.fontSize = fs + "px"; } });
+
+  var price = $("price");
+  if (E.price) { price.textContent = E.price; price.style.background = C.red; price.style.color = C.cream; } else price.style.display = "none";
+
+  // the original photograph – only moved and resized
+  var cup = $("cup"), img = new Image();
+  img.onload = function () {
+    var ar = img.naturalHeight / img.naturalWidth, A = E.cupStart, B = E.cupEnd;
+    var bw = B.width, bh = Math.round(bw * ar), bl = B.centreX - bw / 2, bt2 = B.bottom - bh;
+    Object.assign(cup.style, { width: bw + "px", height: bh + "px", left: bl + "px", top: bt2 + "px", transformOrigin: "50% 0%" });
+    var k0 = A.width / bw, x0 = A.centreX - B.centreX, y0 = A.top - bt2;   // scaled about the top centre
+    $("shadow").style.top = (B.bottom - 34) + "px";
+
+    // strawberry halves drifting at the edges
+    var halves = [
+      { x: 30,  y: 760,  w: 150, r: -30, blur: 0, flip: false },
+      { x: 880, y: 640,  w: 120, r: 35,  blur: 2, flip: true },
+      { x: 860, y: 1420, w: 175, r: 18,  blur: 4, flip: true },
+      { x: -20, y: 1500, w: 130, r: -50, blur: 3, flip: false }
+    ].map(function (h, i) {
+      var el = document.createElement("img"); el.className = "half"; el.src = "assets/strawberry-half.png";
+      Object.assign(el.style, { left: h.x + "px", top: h.y + "px", width: h.w + "px" });
+      if (h.blur) el.style.filter += " blur(" + h.blur + "px)";
+      if (h.flip) el.style.scale = "-1 1";
+      $("halves").appendChild(el); return { el: el, h: h };
+    });
+
+    var tl = gsap.timeline({ paused: true });
+    tl.set({}, {}, D);
+    // 1. cup takes over from the AI clip's cup, then settles lower and smaller to make room for the title
+    tl.fromTo(cup, { x: x0, y: y0, scale: k0 }, { x: 0, y: 0, scale: 1, duration: 1.0, ease: "power3.inOut" }, 0.55);   // holds still until the cross-fade from the AI clip is complete
+    tl.fromTo("#shadow", { autoAlpha: 0, scaleX: 1.3 }, { autoAlpha: 1, scaleX: 1, duration: 0.8, ease: "power2.out" }, 0.9);
+    tl.to(cup, { y: -14, duration: 1.5, ease: "sine.inOut", yoyo: true, repeat: 3 }, 1.45);
+    tl.to("#shadow", { scaleX: 0.92, autoAlpha: 0.8, duration: 1.5, ease: "sine.inOut", yoyo: true, repeat: 3 }, 1.45);
+    // 2. background keeps moving: rays turn slowly, colour blobs drift
+    tl.fromTo("#rays", { autoAlpha: 0, rotation: 0 }, { autoAlpha: 0.16, duration: 0.9, ease: "power1.out" }, 0.5);
+    tl.fromTo("#rays", { rotation: 0 }, { rotation: 22, duration: D, ease: "none", immediateRender: false }, 0);
+    tl.fromTo("#blobA", { x: 0, y: 0 }, { x: 120, y: 90, duration: D, ease: "sine.inOut" }, 0);
+    tl.fromTo("#blobB", { x: 0, y: 0 }, { x: -140, y: -70, duration: D, ease: "sine.inOut" }, 0);
+    // 3. title lines rise out of their masks; the banner wipes open, then its word rises
+    var titleLines = lines.slice();
+    titleLines.forEach(function (l, i) { tl.fromTo(l, { yPercent: 110 }, { yPercent: 0, duration: 0.6, ease: "power3.out" }, 1.0 + i * 0.12); });
+    var tb = 1.0 + titleLines.length * 0.12;
+    tl.fromTo(banner, { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power3.out" }, tb);
+    tl.fromTo(bt, { yPercent: 110 }, { yPercent: 0, duration: 0.55, ease: "power3.out" }, tb + 0.2);
+    tl.to(title, { y: 6, duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: 1 }, tb + 0.8);
+    if (E.price) tl.fromTo(price, { scale: 0, rotation: -40 }, { scale: 1, rotation: -8, duration: 0.6, ease: "back.out(2)" }, tb + 0.4);
+    // 4. logo badge rises in
+    tl.fromTo("#logo", { y: 200, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.7, ease: "power3.out" }, 1.5);
+    // 5. halves drift in from the edges and float
+    halves.forEach(function (o, i) {
+      var dx = o.h.x < W / 2 ? -220 : 220;
+      tl.fromTo(o.el, { x: dx, rotation: o.h.r - 40 * Math.sign(dx), autoAlpha: 0 }, { x: 0, rotation: o.h.r, autoAlpha: 1, duration: 1.0, ease: "power3.out" }, 0.9 + i * 0.1);
+      tl.to(o.el, { y: (i % 2 ? -20 : 20), rotation: o.h.r + (i % 2 ? 8 : -8), duration: 1.3 + i * 0.15, ease: "sine.inOut", yoyo: true, repeat: 2 }, 1.9 + i * 0.1);
+    });
+
+    window.EC_TL = tl;
+    if (q.has("t")) tl.pause(parseFloat(q.get("t"))); else if (!q.has("capture")) tl.play(0); else tl.pause(0);
+    document.body.setAttribute("data-ready", "1");
+  };
+  document.fonts.load("900 120px Montserrat").then(function () { img.src = cup.getAttribute("src"); });
+})();
+</script>
+</body>
+</html>
