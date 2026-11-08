@@ -3,7 +3,7 @@
 # Silent, 1080x1920, 24 fps.
 set -euo pipefail
 cd "$(dirname "$0")"
-MAIN=output/kling4-v3-raw.mp4; START=source/poster-9x16-start-frame.png
+MAIN=output/kling4-v3-bob.mp4; START=source/poster-9x16-start-frame.png
 OUT=output/the-nile-strawberry-millions-milkshake-poster-1080x1920.mp4
 F2=0.8
 DM=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$MAIN")
