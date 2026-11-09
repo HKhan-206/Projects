@@ -20,7 +20,8 @@ import numpy as np
 
 SRC, DST = sys.argv[1], sys.argv[2]
 W, H = 1080, 1920
-START, FULL = 5.4, 7.0           # bob eases in over this window, overlapping the settling
+START, FULL = 5.4, 7.0           # milkshake: bob eases in over this window, overlapping its landing (~7.0 s)
+BERRY_START, BERRY_FULL = 4.5, 6.1   # strawberries: start earlier, as they surface; same gentle ease-in
 FEATHER = 45                      # px of liquid around each item that flexes
 CUP_MASK = "source/cup-mask.png"  # traced outline of the cup + straw in its final position
 
@@ -84,10 +85,15 @@ while True:
     if not ok:
         break
     t = n / fps
-    if t >= START:
-        r = min(1.0, (t - START) / (FULL - START))
-        r = r * r * (3 - 2 * r)
-        offs = np.array([a * r * math.sin(2 * math.pi * (t - START) / p + ph) for a, p, ph in MOTION], np.float32)
+    if t >= BERRY_START:
+        def ease(t0, t1):
+            r = min(1.0, max(0.0, (t - t0) / (t1 - t0)))
+            return r * r * (3 - 2 * r)
+        offs = []
+        for i, (a, p, ph) in enumerate(MOTION):
+            t0, t1 = (START, FULL) if i == 0 else (BERRY_START, BERRY_FULL)
+            offs.append(a * ease(t0, t1) * math.sin(2 * math.pi * (t - t0) / p + ph) if t >= t0 else 0.0)
+        offs = np.array(offs, np.float32)
         dy = (share * offs[:, None, None]).sum(0) * strength
         frame = cv2.remap(frame, xx, yy + dy, interpolation=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REFLECT)
     enc.stdin.write(frame.tobytes())
