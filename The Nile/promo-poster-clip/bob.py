@@ -22,7 +22,7 @@ SRC, DST = sys.argv[1], sys.argv[2]
 W, H = 1080, 1920
 START, FULL = 5.4, 7.0           # milkshake: bob eases in over this window, overlapping its landing (~7.0 s)
 BERRY_START, BERRY_FULL = 4.5, 4.85  # strawberries: start at 4.5 s and reach their full (gentle) bob almost at once
-FEATHER = 45                      # px of liquid around each item that flexes
+FEATHER = 60                      # px of liquid around each item that flexes (wider for the bigger bob)
 CUP_MASK = "source/cup-mask.png"  # traced outline of the cup + straw in its final position
 
 # strawberries: (centre x, centre y, radius x, radius y)  – generous, covering leaves too
@@ -38,9 +38,9 @@ BERRIES = [
     (776, 72, 85, 90),       # top
 ]
 # motion per item: (amplitude px, period s, phase)  – first entry is the cup
-MOTION = [(5.0, 3.2, 0.0),
-          (3.5, 2.9, 1.1), (3.5, 3.4, 2.3), (3.5, 3.0, 0.6), (3.5, 3.6, 3.4),
-          (3.5, 2.8, 4.2), (3.5, 3.3, 5.0), (3.5, 3.1, 1.8), (3.5, 3.5, 2.9), (3.5, 2.9, 5.6)]
+MOTION = [(7.0, 3.2, 0.0),
+          (5.0, 2.9, 1.1), (5.0, 3.4, 2.3), (5.0, 3.0, 0.6), (5.0, 3.6, 3.4),
+          (5.0, 2.8, 4.2), (5.0, 3.3, 5.0), (5.0, 3.1, 1.8), (5.0, 3.5, 2.9), (5.0, 2.9, 5.6)]
 
 yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
 
