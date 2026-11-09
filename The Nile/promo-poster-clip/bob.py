@@ -21,7 +21,7 @@ import numpy as np
 SRC, DST = sys.argv[1], sys.argv[2]
 W, H = 1080, 1920
 START, FULL = 5.4, 7.0           # milkshake: bob eases in over this window, overlapping its landing (~7.0 s)
-BERRY_START, BERRY_FULL = 4.5, 6.1   # strawberries: start earlier, as they surface; same gentle ease-in
+BERRY_START, BERRY_FULL = 4.5, 4.85  # strawberries: start at 4.5 s and reach their full (gentle) bob almost at once
 FEATHER = 45                      # px of liquid around each item that flexes
 CUP_MASK = "source/cup-mask.png"  # traced outline of the cup + straw in its final position
 
