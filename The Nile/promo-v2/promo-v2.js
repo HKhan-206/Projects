@@ -8,6 +8,8 @@
   var freezeAt = params.has("t") ? parseFloat(params.get("t")) : null;
   var rotate = parseInt(params.get("rotate") || "0", 10);
   var motionBlur = params.get("blur") !== "0";
+  // optional preview settings – only set by preview pages (e.g. preview-cheese.html); the live screen sets none
+  var OPT = window.PROMO_OPTIONS || {};
   var W = 1080, H = 1920, K = 0.95;          // photos are shown at 95% of their pixel size
   var NS = "http://www.w3.org/2000/svg";
   var ORANGE = CFG.orange || "#FD7E14";
@@ -175,6 +177,11 @@
       sv("path", { d: "M950,410 L1060,362" }, gR)
     ];
 
+    if (OPT.topDrip) {   // preview: drip across the top edge
+      sc.drip = el("img", "top-drip", sc.root); sc.drip.src = OPT.topDrip; sc.drip.alt = "";
+      Object.assign(sc.drip.style, { position: "absolute", left: "0", top: "0", width: W + "px", height: "auto", transformOrigin: "50% 0%", willChange: "transform" });
+    }
+
     // title on its dark brush panel
     var tw = el("div", "title-wrap", sc.root);
     var panelSvg = sv("svg", { style: "position:absolute;left:0;top:0;overflow:visible" }, tw);
@@ -196,7 +203,7 @@
     var tW = widest();
     sc.lines.forEach(function (l) { l.el.style.display = "block"; l.el.style.float = "none"; });
     var tH = sc.title.offsetHeight;
-    var top = Math.max(150, Math.round(470 - tH / 2));
+    var top = Math.max(150, Math.round(470 - tH / 2)) + (OPT.titleOffset || 0);
     tw.style.top = top + "px";
     var px = 40, py = 24;
     panelSvg.setAttribute("width", tW + px * 2 + 90);
@@ -271,6 +278,7 @@
     tagSvg.setAttribute("width", tagW + 90);
     sc.tagPanel.setAttribute("d", brushRect(8, 4, tagW, 150, R));
     sc.flame = flame;
+    if (OPT.hideTagline) sc.tag.style.display = "none";
     return sc;
   }
 
@@ -321,6 +329,12 @@
     tl.fromTo(sc.flame, { autoAlpha: 0, scale: 0, transformOrigin: "50% 100%" }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: "back.out(3)" }, e + 0.6);
     drawIn(tl, sc.zigRed, e + 0.6, 0.4);
     drawIn(tl, sc.zig, e + 0.7, 0.4);
+
+    if (sc.drip) {
+      tl.fromTo(sc.drip, { yPercent: -100 }, { yPercent: 0, duration: 1.0, ease: "power2.out" }, 0.15);
+      tl.to(sc.drip, { scaleY: 1.06, duration: 2.2, ease: "sine.inOut", yoyo: true, repeat: Math.max(1, Math.floor((T - 1.4) / 2.2) - 1) }, 1.15);
+      tl.to(sc.drip, { yPercent: -100, duration: 0.4, ease: "power2.in" }, T - 0.45);
+    }
 
     // slow push-in while it holds, then everything pushes forward on the way out
     tl.to(p, { scale: 1.035 * z, duration: T - 2.6, ease: "none" }, 2.0);
