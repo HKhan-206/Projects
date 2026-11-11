@@ -178,8 +178,18 @@
     ];
 
     if (OPT.topDrip) {   // preview: drip across the top edge
-      sc.drip = el("img", "top-drip", sc.root); sc.drip.src = OPT.topDrip; sc.drip.alt = "";
-      Object.assign(sc.drip.style, { position: "absolute", left: "0", top: "0", width: W + "px", height: "auto", transformOrigin: "50% 0%", willChange: "transform" });
+      if (typeof OPT.topDrip === "string") {
+        sc.drip = el("img", "top-drip", sc.root); sc.drip.src = OPT.topDrip; sc.drip.alt = "";
+        Object.assign(sc.drip.style, { position: "absolute", left: "0", top: "0", width: W + "px", height: "auto", transformOrigin: "50% 0%", willChange: "transform" });
+      } else {             // layered drip: its shadow and glow fall on this slide's own orange, then the cheese on top
+        var D = OPT.topDrip;   // (separate layers, not a wrapper, so the blend modes reach the slide behind)
+        sc.drip = [[D.shadow, "multiply"], [D.glow, "plus-lighter"], [D.cheese, "normal"]].filter(function (L) { return L[0]; }).map(function (L) {
+          var im = el("img", "top-drip", sc.root); im.src = L[0]; im.alt = "";
+          Object.assign(im.style, { position: "absolute", left: "0", top: "0", width: W + "px", height: D.height + "px", mixBlendMode: L[1], transformOrigin: "50% 0%", willChange: "transform" });
+          return im;
+        });
+      }
+      if (OPT.hideTopSmear) sc.smears[0].style.display = "none";
     }
 
     // title on its dark brush panel
