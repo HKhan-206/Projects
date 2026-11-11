@@ -178,7 +178,13 @@
     ];
 
     if (OPT.topDrip) {   // preview: drip across the top edge
-      if (typeof OPT.topDrip === "string") {
+      if (OPT.topDrip.video) {   // real dripping cheese: a see-through video, one copy per slide
+        sc.dripVideo = el("video", "top-drip", sc.root);
+        Object.assign(sc.dripVideo, { src: OPT.topDrip.video, muted: true, playsInline: true, preload: "auto" });
+        sc.dripVideo.setAttribute("muted", ""); sc.dripVideo.setAttribute("playsinline", "");
+        Object.assign(sc.dripVideo.style, { position: "absolute", left: "0", top: "0", width: W + "px", height: OPT.topDrip.height + "px", willChange: "transform" });
+        sc.drip = sc.dripVideo;
+      } else if (typeof OPT.topDrip === "string") {
         sc.drip = el("img", "top-drip", sc.root); sc.drip.src = OPT.topDrip; sc.drip.alt = "";
         Object.assign(sc.drip.style, { position: "absolute", left: "0", top: "0", width: W + "px", height: "auto", transformOrigin: "50% 0%", willChange: "transform" });
       } else {             // layered drip: its shadow and glow fall on this slide's own orange, then the cheese on top
@@ -340,7 +346,14 @@
     drawIn(tl, sc.zigRed, e + 0.6, 0.4);
     drawIn(tl, sc.zig, e + 0.7, 0.4);
 
-    if (sc.drip) {
+    if (sc.dripVideo) {     // the video does the dripping; the timeline just starts it (or steers it frame by frame when capturing)
+      var v = sc.dripVideo, vp = { t: 0 }, vStart = 0.15, vDur = Math.min(T - vStart, OPT.topDrip.duration || 10.9);
+      var stepped = params.has("capture") || freezeAt != null;
+      tl.call(function () { if (!stepped) { try { v.currentTime = 0; v.play(); } catch (e) {} } }, null, vStart);
+      tl.fromTo(vp, { t: 0 }, { t: vDur, duration: vDur, ease: "none", onUpdate: function () { if (stepped) v.currentTime = vp.t; } }, vStart);
+      tl.to(v, { yPercent: -100, duration: 0.4, ease: "power2.in" }, T - 0.45);
+      tl.set(v, { yPercent: 0 }, T);
+    } else if (sc.drip) {
       tl.fromTo(sc.drip, { yPercent: -100 }, { yPercent: 0, duration: 1.0, ease: "power2.out" }, 0.15);
       tl.to(sc.drip, { scaleY: 1.06, duration: 2.2, ease: "sine.inOut", yoyo: true, repeat: Math.max(1, Math.floor((T - 1.4) / 2.2) - 1) }, 1.15);
       tl.to(sc.drip, { yPercent: -100, duration: 0.4, ease: "power2.in" }, T - 0.45);
