@@ -9,7 +9,11 @@ One 12 s loop per food slide (24 fps), see-through VP9 WebM, 1080 px wide band:
 The drips are moved, never squashed: each drip slides out of the band like liquid running down,
 so the rounded tips keep the exact shape from the image. A soft shadow follows the cheese.
 
-Usage: python3 animate_cheese.py <cheese.png> <out.webm>
+Style "settle" (third argument): the band is there from the first frame, the drips run down a little
+from short stubs to their length in the image (~0.3 - 4.5 s), then everything keeps moving gently
+until the end of the slide - no slide-in, no pull-back.
+
+Usage: python3 animate_cheese.py <cheese.png> <out.webm> [style: full | settle]
 """
 import math
 import subprocess
@@ -19,6 +23,7 @@ import cv2
 import numpy as np
 
 SRC, DST = sys.argv[1], sys.argv[2]
+STYLE = sys.argv[3] if len(sys.argv) > 3 else "full"
 W, BAND, FPS, DUR = 1080, 560, 24, 12.0
 
 img = cv2.imread(SRC, cv2.IMREAD_UNCHANGED)                      # BGRA, transparent background
@@ -80,15 +85,25 @@ enc = subprocess.Popen(
 frames = int(round(DUR * FPS))
 for n in range(frames):
     t = n / FPS
-    out_g = ease((t - grow_start) / grow_time)                      # 0 -> 1 as each drip runs down
-    back = ease((t - back_start) / back_time)                       # 0 -> 1 as it is drawn back up
-    extra = 18 * ease((t - 6.0) / 3.5)                              # slow extra stretch while it holds
-    wob = 5 * np.sin(2 * np.pi * t / wob_period + wob_phase) * ease((t - 4.0) / 2.0)
-    shown = np.clip(out_g * (1 - back), 0, 1)
-    # how far up the drip is pulled into the band (px); negative = a touch longer than the image
-    pull = (1 - shown) * (drip_len + 12) - shown * (extra + wob)
-    # whole band: slides in at the start, is drawn up and out at the end
-    band_shift = -(band_y.max() + 40) * (1 - ease((t - 0.3) / 1.0)) - (band_y.max() + 40) * ease((t - 11.0) / 0.9)
+    if STYLE == "settle":
+        # stubs (35 % of each drip) at the start, running down to full length at their own pace
+        g = ease((t - (0.3 + 0.8 * n1)) / (3.0 + 1.2 * n2))
+        shown = 0.35 + 0.65 * g
+        extra = 10 * ease((t - 4.0) / 6.0)                           # creeps on very slightly
+        wob = 4 * np.sin(2 * np.pi * t / wob_period + wob_phase) * ease((t - 1.5) / 2.5)
+        sway = 2.5 * np.sin(2 * np.pi * t / 3.1 + 1.0)               # whole band breathes a touch
+        pull = (1 - shown) * (drip_len + 12) - shown * (extra + wob)
+        band_shift = sway * ease(t / 1.5)
+    else:
+        out_g = ease((t - grow_start) / grow_time)                  # 0 -> 1 as each drip runs down
+        back = ease((t - back_start) / back_time)                   # 0 -> 1 as it is drawn back up
+        extra = 18 * ease((t - 6.0) / 3.5)                          # slow extra stretch while it holds
+        wob = 5 * np.sin(2 * np.pi * t / wob_period + wob_phase) * ease((t - 4.0) / 2.0)
+        shown = np.clip(out_g * (1 - back), 0, 1)
+        # how far up the drip is pulled into the band (px); negative = a touch longer than the image
+        pull = (1 - shown) * (drip_len + 12) - shown * (extra + wob)
+        # whole band: slides in at the start, is drawn up and out at the end
+        band_shift = -(band_y.max() + 40) * (1 - ease((t - 0.3) / 1.0)) - (band_y.max() + 40) * ease((t - 11.0) / 0.9)
 
     map_y = yy + pull[None, :] * ramp - band_shift
     f = cv2.remap(pre, xx, map_y.astype(np.float32), cv2.INTER_CUBIC, borderMode=cv2.BORDER_CONSTANT, borderValue=0)
