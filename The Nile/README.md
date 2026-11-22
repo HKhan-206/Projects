@@ -8,6 +8,13 @@ Everything runs from these files – no internet, no login and no Claude account
 | 1 | `screen1.html` | Starters, Pizzas, Garlic Breads |
 | 2 | `screen2.html` | Burgers, The Steak House, Kebabs, Chicken, Side Orders |
 | 3 | `screen3.html` | Sauces, Cakes, Milkshakes, Cookie Doughs, Ice Creams, Slushes, Drinks |
+| Promo | `promo/index.html` | Animated food adverts – see `promo/README.md` |
+
+The screens use the **cream design** (files in `menu-style2/`: `style2.css`, `decor.js` and
+`layout.js`, which sets which sections go on which screen and the text sizes).
+The previous **orange design** is kept as `screen1-orange.html`, `screen2-orange.html` and
+`screen3-orange.html`; open those instead to go back to it. Both designs read the same
+names and prices from `menu-data.js`.
 
 `index.html` is a start page with a button for each screen.
 
