@@ -12,9 +12,9 @@ Everything runs from these files – no internet, no login and no Claude account
 
 The screens use the **cream design** (files in `menu-style2/`: `style2.css`, `decor.js` and
 `layout.js`, which sets which sections go on which screen and the text sizes).
-The previous **orange design** is kept as `screen1-orange.html`, `screen2-orange.html` and
-`screen3-orange.html`; open those instead to go back to it. Both designs read the same
-names and prices from `menu-data.js`.
+Names and prices come from `menu-data.js`.
+The previous **orange design** is kept on the `backup/promo-2026-10-30` branch
+(`screen1-orange.html`, `screen2-orange.html`, `screen3-orange.html`, with the same latest prices).
 
 `index.html` is a start page with a button for each screen.
 
@@ -87,8 +87,10 @@ Which sections go on which screen is at the bottom of `menu-data.js` (`screens:`
 
 1. Repository Settings → General → Danger Zone → make the repository **public**
    (free GitHub Pages needs a public repository).
-2. Settings → Pages → Source: **Deploy from a branch** → pick the branch that has this folder
-   (e.g. `main`) and **/ (root)** → Save. Wait 1–2 minutes.
+2. Settings → Pages → Source: **Deploy from a branch** → pick the branch **`live-screens`**
+   and **/ (root)** → Save. Wait 1–2 minutes.
+   Only the three menu screens are published from that branch – backups, previews and promo
+   work are not. It is filled automatically (see "Publishing" below).
 3. Enter one address in each screen's browser and set it as the start page:
    - Screen 1: `https://hkhan-206.github.io/Projects/The%20Nile/screen1.html`
    - Screen 2: `https://hkhan-206.github.io/Projects/The%20Nile/screen2.html`
@@ -97,5 +99,14 @@ Which sections go on which screen is at the bottom of `menu-data.js` (`screens:`
    (`%20` is how a web address writes the space in "The Nile".)
 4. Use the screen's own portrait setting, or add `?rotate=90` to the address.
 
-Edits to `menu-data.js` on GitHub show on the screens within about an hour.
+Edits to `menu-data.js` on `main` show on the screens within about an hour.
 If the internet drops, the screen keeps the menu up and retries every 5 minutes.
+
+### Publishing (automatic)
+
+Every time `main` changes, the GitHub task **Publish menu screens**
+(`.github/workflows/publish-menu-screens.yml`) copies **only** the files the three menu screens
+need into the `live-screens` branch, which GitHub Pages serves. The list of files is in
+`publish/collect.sh`; the start page for the published site is `publish/index.html`.
+To publish by hand: GitHub → **Actions** → **Publish menu screens** → **Run workflow**.
+Never edit the `live-screens` branch directly – it is replaced on every publish.
