@@ -1,0 +1,38 @@
+# Publishes ONLY the live menu screens to the "live-screens" branch, which GitHub Pages serves.
+# Runs every time main changes (e.g. a price edit in "The Nile/menu-data.js"), or by hand from the Actions tab.
+# Backups, previews and promo work stay on main and are not published.
+name: Publish menu screens
+
+on:
+  push:
+    branches: [main]
+    paths: ["The Nile/**", ".github/workflows/publish-menu-screens.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-menu-screens
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Collect only the live menu screen files
+        run: '"The Nile/publish/collect.sh" "$RUNNER_TEMP/site"'
+
+      - name: Push them to the live-screens branch
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd "$RUNNER_TEMP/site"
+          git init -q -b live-screens
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Publish menu screens from main ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" live-screens
