@@ -1,6 +1,7 @@
-/* PREVIEW ONLY – which sections go on which screen in this style.
-   Overrides the layout in ../menu-data.js for these preview pages only;
-   items and prices still come from ../menu-data.js. */
+/* Cream design (live) – which sections go on which screen.
+   Overrides the layout in ../menu-data.js for the cream pages; the orange backups
+   (screen1-3-orange.html) still use the layout in menu-data.js.
+   Items and prices always come from ../menu-data.js. */
 // allergy notice shown at the bottom of screen 2 (preview only)
 window.MENU.sections.allergy = {
   title: "Allergy Advice",

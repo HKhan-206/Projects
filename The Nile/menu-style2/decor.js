@@ -1,5 +1,9 @@
-/* PREVIEW ONLY – adds the header, geometric pattern and floor strip before the menu is drawn. */
+/* Cream design – adds the header, geometric pattern and floor strip before the menu is drawn.
+   Used by the live screens (../screen1-3.html) and the copies in this folder. */
 (function () {
+  // images are found relative to this file, so the pages can live in any folder
+  var here = (document.currentScript && document.currentScript.src) || location.href;
+  var IMG = new URL("../promo-v2/images/", here).href;
   var stage = document.getElementById("stage");
   var n = String(window.SCREEN || 1);
   function el(tag, cls, parent, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; parent.appendChild(e); return e; }
@@ -23,7 +27,7 @@
   // logo only on screen 1, centred; other screens get no header at all
   if (n === "1") {
     var h = el("div", "hdr", stage);
-    el("div", "brand", h, '<img src="../promo-v2/images/logo-triangle-dark.png" alt=""><div class="n">THE NILE</div><div class="o">ORIGIN<img class="fl" src="../promo-v2/images/flame-small.png" alt="A">L</div><div class="u"></div>');
+    el("div", "brand", h, '<img src="' + IMG + 'logo-triangle-dark.png" alt=""><div class="n">THE NILE</div><div class="o">ORIGIN<img class="fl" src="' + IMG + 'flame-small.png" alt="A">L</div><div class="u"></div>');
   } else {
     document.documentElement.classList.add("no-head");
   }
