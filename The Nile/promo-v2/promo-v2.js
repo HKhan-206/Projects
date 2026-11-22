@@ -349,6 +349,8 @@
     if (sc.dripVideo) {     // the video does the dripping; the timeline just starts it (or steers it frame by frame when capturing)
       var v = sc.dripVideo, vp = { t: 0 }, vStart = OPT.topDrip.start != null ? OPT.topDrip.start : 0.15, vDur = Math.min(T - vStart, OPT.topDrip.duration || 10.9);
       var stepped = params.has("capture") || freezeAt != null;
+      // back to the clip's first (empty) frame whenever the slide starts, so the next loop begins clean
+      tl.call(function () { try { v.pause(); v.currentTime = 0; } catch (e) {} }, null, 0);
       tl.call(function () { if (!stepped) { try { v.currentTime = 0; v.play(); } catch (e) {} } }, null, vStart);
       tl.fromTo(vp, { t: 0 }, { t: vDur, duration: vDur, ease: "none", onUpdate: function () { if (stepped) v.currentTime = vp.t; } }, vStart);
       if (OPT.topDrip.slideOut !== false) {   // older clips: slide the cheese away; clips that retract on their own set slideOut: false
