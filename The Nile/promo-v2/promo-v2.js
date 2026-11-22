@@ -347,12 +347,14 @@
     drawIn(tl, sc.zig, e + 0.7, 0.4);
 
     if (sc.dripVideo) {     // the video does the dripping; the timeline just starts it (or steers it frame by frame when capturing)
-      var v = sc.dripVideo, vp = { t: 0 }, vStart = 0.15, vDur = Math.min(T - vStart, OPT.topDrip.duration || 10.9);
+      var v = sc.dripVideo, vp = { t: 0 }, vStart = OPT.topDrip.start != null ? OPT.topDrip.start : 0.15, vDur = Math.min(T - vStart, OPT.topDrip.duration || 10.9);
       var stepped = params.has("capture") || freezeAt != null;
       tl.call(function () { if (!stepped) { try { v.currentTime = 0; v.play(); } catch (e) {} } }, null, vStart);
       tl.fromTo(vp, { t: 0 }, { t: vDur, duration: vDur, ease: "none", onUpdate: function () { if (stepped) v.currentTime = vp.t; } }, vStart);
-      tl.to(v, { yPercent: -100, duration: 0.4, ease: "power2.in" }, T - 0.45);
-      tl.set(v, { yPercent: 0 }, T);
+      if (OPT.topDrip.slideOut !== false) {   // older clips: slide the cheese away; clips that retract on their own set slideOut: false
+        tl.to(v, { yPercent: -100, duration: 0.4, ease: "power2.in" }, T - 0.45);
+        tl.set(v, { yPercent: 0 }, T);
+      }
     } else if (sc.drip) {
       tl.fromTo(sc.drip, { yPercent: -100 }, { yPercent: 0, duration: 1.0, ease: "power2.out" }, 0.15);
       tl.to(sc.drip, { scaleY: 1.06, duration: 2.2, ease: "sine.inOut", yoyo: true, repeat: Math.max(1, Math.floor((T - 1.4) / 2.2) - 1) }, 1.15);
