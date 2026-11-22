@@ -31,6 +31,8 @@ img = cv2.resize(img, (W, round(img.shape[0] * W / img.shape[1])), interpolation
 img = img[:BAND].astype(np.float32)
 alpha = img[..., 3] / 255.0
 # premultiply so warping never drags dark/transparent colour into the cheese edges
+img[..., 2] = np.clip(img[..., 2] * 1.07, 0, 255)   # red   (BGR order)
+img[..., 1] = np.clip(img[..., 1] * 1.07, 0, 255)   # green -> brighter, more golden
 pre = img.copy(); pre[..., :3] *= alpha[..., None]
 
 # --- where the band ends and how long each drip is -------------------------------------------------
@@ -86,9 +88,9 @@ frames = int(round(DUR * FPS))
 for n in range(frames):
     t = n / FPS
     if STYLE == "settle":
-        # stubs (35 % of each drip) at the start, running down to full length at their own pace
+        # drips already part-way down (60 % of their length) at the start, running on to full length
         g = ease((t - (0.3 + 0.8 * n1)) / (3.0 + 1.2 * n2))
-        shown = 0.35 + 0.65 * g
+        shown = 0.60 + 0.40 * g
         extra = 10 * ease((t - 4.0) / 6.0)                           # creeps on very slightly
         wob = 4 * np.sin(2 * np.pi * t / wob_period + wob_phase) * ease((t - 1.5) / 2.5)
         sway = 2.5 * np.sin(2 * np.pi * t / 3.1 + 1.0)               # whole band breathes a touch
@@ -110,10 +112,11 @@ for n in range(frames):
     a = np.clip(f[..., 3] / 255.0, 0, 1)
     rgb = f[..., :3] / np.maximum(a[..., None], 1e-4)
 
-    sh = np.zeros_like(a); sh[14:] = a[:-14]
-    sh = cv2.GaussianBlur(sh, (0, 0), 10) * 0.30
+    sh = np.zeros_like(a); sh[12:] = a[:-12]
+    sh = cv2.GaussianBlur(sh, (0, 0), 9) * 0.38
     A = a + sh * (1 - a)
-    out_rgb = (rgb * a[..., None]) / np.maximum(A[..., None], 1e-4)
+    SHADOW = np.array([0, 48, 128], np.float32)      # deep burnt orange (BGR), not black
+    out_rgb = (rgb * a[..., None] + SHADOW * (sh * (1 - a))[..., None]) / np.maximum(A[..., None], 1e-4)
     enc.stdin.write(np.dstack([out_rgb, A * 255]).clip(0, 255).astype(np.uint8).tobytes())
 
 enc.stdin.close()
