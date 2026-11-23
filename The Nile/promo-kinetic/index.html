@@ -185,15 +185,16 @@
     background: "repeating-conic-gradient(rgba(255,168,30,0.10) 0deg 4deg, rgba(0,0,0,0) 4deg 12deg)" });
   var disc = el("div", "abs", s5, { left: "40px", top: "460px", width: "1000px", height: "1000px", borderRadius: "50%",
     background: "conic-gradient(from 20deg, rgba(255,255,255,0.10), rgba(255,255,255,0) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0) 75%, rgba(255,255,255,0.10)), repeating-radial-gradient(circle, #0e0e0e 0 4px, #2e2e2e 4px 6px)", boxShadow: "0 0 0 10px #0b0b0b, 0 40px 80px rgba(0,0,0,0.6)" });
-  var pz = el("img", "abs", s5, { left: "125px", top: "520px", width: "830px" }); pz.src = "assets/cutouts/pizza.png";
+  var pz = el("img", "abs", s5, { left: "125px", top: "567px", width: "830px" }); pz.src = "assets/cutouts/pizza.png";   // centred on the record (540, 960); kept upright, exactly as photographed
   var ring = el("div", "abs", s5, { left: "0", top: "420px", width: "1080px", height: "1080px" },
     '<svg width="1080" height="1080" viewBox="0 0 1080 1080"><defs><path id="circ" d="M540,540 m-505,0 a505,505 0 1,1 1010,0 a505,505 0 1,1 -1010,0"/></defs>' +
-    '<text font-family="Archivo Black" font-size="60" letter-spacing="7" fill="#fff"><textPath href="#circ">FULL OF FLAVOUR • FULL OF FLAVOUR • FULL OF FLAVOUR • FULL OF FLAVOUR •</textPath></text></svg>');
+    '<text font-family="Archivo Black" font-size="60" fill="#fff"><textPath href="#circ" textLength="3150" lengthAdjust="spacing">FULL OF FLAVOUR • FULL OF FLAVOUR • FULL OF FLAVOUR •</textPath></text></svg>');
   var st1 = star(s5, 30, 150, 330, "#ffa81e", 9), st2 = star(s5, 760, 1450, 270, "#ef6f4c", 8);
   var lbl5 = word(s5, "THE NILE", "anton", 140, { left: "410px", top: "200px", color: "#fff" });
   tl.fromTo(s5, { scale: 0.4, rotation: -30 }, { scale: 1, rotation: 0, duration: 0.24, ease: "power4.out" }, T5);
   tl.fromTo(rays, { rotation: 0 }, { rotation: 40, duration: 1.2, ease: "none" }, T5);
-  tl.fromTo([disc, pz], { rotation: 0 }, { rotation: -260, duration: 1.2, ease: "power2.out" }, T5);
+  tl.fromTo(disc, { rotation: 0 }, { rotation: -260, duration: 1.2, ease: "power2.out" }, T5);   // only the record spins, not the pizza
+  tl.fromTo(pz, { scale: 0.6 }, { scale: 1, duration: 0.3, ease: "back.out(1.8)" }, T5);
   tl.fromTo(ring, { rotation: 0, opacity: 0 }, { rotation: 70, opacity: 1, duration: 1.2, ease: "power1.out" }, T5);
   tl.fromTo(st1, { scale: 0, rotation: -90 }, { scale: 1, rotation: 0, duration: 0.2, ease: "back.out(2.5)" }, T5 + 0.3);
   tl.fromTo(st2, { scale: 0, rotation: 90 }, { scale: 1, rotation: 0, duration: 0.2, ease: "back.out(2.5)" }, T5 + 0.5);
