@@ -4,6 +4,12 @@ An animated advert for a **portrait 1080 × 1920 screen**. It loops forever, wit
 no buttons, no prices and no login. It plays 13 food slides in the poster style, plus the
 4 slogan slides, about 2 minutes 15 seconds per loop.
 
+> **Status: live, still a work in progress.** `index.html` is published as the promo screen
+> (https://hkhan-206.github.io/Projects/The%20Nile/promo-v2/index.html), with the cheese drip and
+> the moulded title. More is still being added. Each addition goes live when it is merged into
+> `main`: the publish job then updates the `live-screens` branch on its own.
+> A new image or video must also be listed in `../publish/collect.sh`, or it won't be published.
+
 | File | What it is |
 |---|---|
 | `index.html` | **Open this to play it** |
