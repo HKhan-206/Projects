@@ -89,12 +89,13 @@ Which sections go on which screen is at the bottom of `menu-data.js` (`screens:`
    (free GitHub Pages needs a public repository).
 2. Settings → Pages → Source: **Deploy from a branch** → pick the branch **`live-screens`**
    and **/ (root)** → Save. Wait 1–2 minutes.
-   Only the three menu screens are published from that branch – backups, previews and promo
-   work are not. It is filled automatically (see "Publishing" below).
+   Only the three menu screens and the promo screen are published from that branch – backups,
+   previews and other promo work are not. It is filled automatically (see "Publishing" below).
 3. Enter one address in each screen's browser and set it as the start page:
    - Screen 1: `https://hkhan-206.github.io/Projects/The%20Nile/screen1.html`
    - Screen 2: `https://hkhan-206.github.io/Projects/The%20Nile/screen2.html`
    - Screen 3: `https://hkhan-206.github.io/Projects/The%20Nile/screen3.html`
+   - Promo screen (portrait): `https://hkhan-206.github.io/Projects/The%20Nile/promo-v2/index.html`
 
    (`%20` is how a web address writes the space in "The Nile".)
 4. Use the screen's own portrait setting, or add `?rotate=90` to the address.
