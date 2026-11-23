@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Nile – kinetic photo edit</title>
+<style>
+  @font-face { font-family: "Anton"; src: url(assets/fonts/anton-latin-400-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Archivo Black"; src: url(assets/fonts/archivo-black-latin-400-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Montserrat"; font-weight: 800; src: url(../fonts/montserrat-latin-800-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Montserrat"; font-weight: 900; src: url(../fonts/montserrat-latin-900-normal.woff2) format("woff2"); }
+  :root { --orange: #ffa81e; --coral: #ef6f4c; --red: #b3141b; --black: #0b0b0b; --white: #ffffff; --cream: #fff4e2; --grey: #ecE8e1; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+  #stage { position: absolute; left: 50%; top: 50%; width: 1080px; height: 1920px; overflow: hidden; background: #000; transform-origin: center; }
+  #world { position: absolute; inset: 0; }
+  .scene { position: absolute; inset: 0; overflow: hidden; visibility: hidden; }
+  .abs { position: absolute; }
+  .anton { font-family: "Anton", sans-serif; line-height: 0.86; text-transform: uppercase; white-space: nowrap; }
+  .archivo { font-family: "Archivo Black", sans-serif; text-transform: uppercase; white-space: nowrap; }
+  .mont { font-family: "Montserrat", sans-serif; font-weight: 800; white-space: nowrap; }
+  .ch { display: inline-block; will-change: transform; }
+  .clip { position: absolute; inset: 0; width: 1080px; height: 1920px; object-fit: cover; }
+  .frame-border { position: absolute; inset: 36px; border: 4px solid rgba(255,255,255,0.9); pointer-events: none; }
+  .card { position: absolute; background: #fff; padding: 18px; box-shadow: 0 30px 60px rgba(0,0,0,0.35); }
+  .card .ph { width: 100%; height: 100%; background-size: cover; background-position: center; }
+  .sq { position: absolute; width: 26px; height: 26px; background: var(--black); }
+  .outline { color: transparent; -webkit-text-stroke: 5px var(--white); }
+  .widget { position: absolute; background: #1c1c1e; border-radius: 56px; }
+  #grain { position: absolute; inset: -200px; background: url(assets/grain.png); opacity: 0.07; mix-blend-mode: overlay; pointer-events: none; }
+  #flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="stage"><div id="world"></div><div id="grain"></div><div id="flash"></div></div>
+<script src="gsap.min.js"></script>
+<script>
+(function () {
+  "use strict";
+  var W = 1080, H = 1920, FPS = 30, DUR = 14.5;
+  var stage = document.getElementById("stage"), world = document.getElementById("world");
+  var q = new URLSearchParams(location.search);
+  function fitStage() { var k = Math.min(innerWidth / W, innerHeight / H); stage.style.transform = "translate(-50%,-50%) scale(" + k + ")"; }
+  fitStage(); addEventListener("resize", fitStage);
+
+  // ---------- helpers -------------------------------------------------------------------------
+  function el(tag, cls, parent, css, html) {
+    var e = document.createElement(tag); if (cls) e.className = cls;
+    if (css) Object.assign(e.style, css); if (html != null) e.innerHTML = html;
+    (parent || world).appendChild(e); return e;
+  }
+  function scene(bg) { return el("div", "scene", world, { background: bg || "transparent" }); }
+  // a line of type split into letters (for staggered slams); fitted to maxW
+  function word(parent, text, cls, size, css, maxW) {
+    var w = el("div", cls + " abs", parent, Object.assign({ fontSize: size + "px" }, css || {}));
+    text.split("").forEach(function (c) { el("span", "ch", w, null, c === " " ? "&nbsp;" : c); });
+    if (maxW) { var s = size; while (w.scrollWidth > maxW && s > 20) { s -= 4; w.style.fontSize = s + "px"; } }
+    return w;
+  }
+  function letters(w) { return Array.prototype.slice.call(w.querySelectorAll(".ch")); }
+  function barcode(parent, x, y, w, h, label, colour) {
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + (h + 46) + '">', px = 0, seed = 11;
+    function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    while (px < w - 6) { var bw = 2 + Math.floor(rnd() * 4) * 2; if (rnd() > 0.38) svg += '<rect x="' + px + '" y="0" width="' + bw + '" height="' + h + '" fill="' + colour + '"/>'; px += bw + 2; }
+    svg += '<text x="0" y="' + (h + 38) + '" font-family="Archivo Black" font-size="30" letter-spacing="6" fill="' + colour + '">' + label + '</text></svg>';
+    return el("div", "abs", parent, { left: x + "px", top: y + "px" }, svg);
+  }
+  function star(parent, x, y, size, fill, points) {
+    points = points || 8; var pts = [], c = size / 2;
+    for (var i = 0; i < points * 2; i++) { var r = i % 2 ? c * 0.48 : c, a = Math.PI * i / points - Math.PI / 2; pts.push((c + r * Math.cos(a)).toFixed(1) + "," + (c + r * Math.sin(a)).toFixed(1)); }
+    return el("div", "abs", parent, { left: x + "px", top: y + "px", width: size + "px", height: size + "px" },
+      '<svg width="' + size + '" height="' + size + '"><polygon points="' + pts.join(" ") + '" fill="' + fill + '" stroke="#0b0b0b" stroke-width="6"/></svg>');
+  }
+
+  // ---------- frame-sequence clips (Seedance shots, played frame-exact) -------------------------
+  function sequence(parent, folder, count) {
+    var img = el("img", "clip", parent); img.alt = "";
+    var srcs = []; for (var i = 1; i <= count; i++) srcs.push(folder + "/" + String(i).padStart(3, "0") + ".jpg");
+    var cache = srcs.map(function (s) { var im = new Image(); im.src = s; return im; });
+    img.src = srcs[0];
+    return { img: img, srcs: srcs, cache: cache, count: count, show: function (t) { var i = Math.max(0, Math.min(count - 1, Math.floor(t * 24 + 1e-6))); var s = srcs[i]; if (img.getAttribute("src") !== s) img.setAttribute("src", s); } };
+  }
+
+  function build() {
+  var tl = gsap.timeline({ paused: true });
+  tl.set({}, {}, DUR);
+  var seqs = [];
+  function shake(t, amt) { tl.fromTo(world, { x: amt, y: -amt * 0.6 }, { x: 0, y: 0, duration: 0.16, ease: "rough({strength: 2, points: 6, randomize: false})" }, t); }
+  function flash(t, o) { tl.set("#flash", { opacity: o || 1 }, t); tl.set("#flash", { opacity: 0 }, t + 1 / FPS); }
+  function show(sc, t0, t1) { tl.set(sc, { visibility: "visible" }, t0); tl.set(sc, { visibility: "hidden" }, t1); }
+  function slam(targets, t, from, stagger, dur) {
+    tl.fromTo(targets, Object.assign({ scale: 2.2, opacity: 0, filter: "blur(12px)" }, from || {}),
+      { scale: 1, opacity: 1, x: 0, y: 0, rotation: 0, filter: "blur(0px)", duration: dur || 0.14, ease: "power4.out", stagger: stagger || 0 }, t);
+  }
+
+  // ============ S1 · title card (0.30 – 1.60) ===================================================
+  var s1 = scene("#ffffff"); show(s1, 0.30, 1.60);
+  var sqs = [0, 1, 2].map(function (i) { return el("div", "sq", s1, { left: (70 + i * 40) + "px", top: "90px", background: i === 1 ? "var(--coral)" : "var(--black)" }); });
+  var rule = el("div", "abs", s1, { left: "70px", top: "150px", width: "940px", height: "6px", background: "var(--black)", transformOrigin: "0 50%" });
+  var the = word(s1, "THE", "anton", 300, { left: "62px", top: "330px", color: "var(--black)" });
+  var nile = word(s1, "NILE", "anton", 760, { left: "50px", top: "600px", color: "var(--black)", letterSpacing: "-6px" }, 990);
+  var bar = el("div", "abs", s1, { left: "0", top: "1330px", width: "1080px", height: "150px", background: "var(--black)", transformOrigin: "0 50%", overflow: "hidden" });
+  var marquee = el("div", "archivo abs", bar, { left: "0", top: "38px", fontSize: "64px", color: "var(--white)", letterSpacing: "2px" },
+    "FRESHLY GRILLED &nbsp;•&nbsp; FULL OF FLAVOUR &nbsp;•&nbsp; FRESHLY GRILLED &nbsp;•&nbsp; FULL OF FLAVOUR &nbsp;•&nbsp;");
+  var bc1 = barcode(s1, 690, 1590, 320, 120, "THE NILE", "#0b0b0b");
+  var tri1 = el("img", "abs", s1, { left: "70px", top: "1600px", width: "190px" }); tri1.src = "../promo-v2/images/logo-triangle-dark.png";
+  tl.fromTo(sqs, { scale: 0 }, { scale: 1, duration: 0.12, stagger: 0.04, ease: "back.out(3)" }, 0.32);
+  tl.fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power4.out" }, 0.34);
+  tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 0.2, ease: "power4.out" }, 0.36);
+  tl.fromTo(marquee, { x: 0 }, { x: -620, duration: 1.3, ease: "none" }, 0.30);
+  slam(letters(the), 0.40, null, 0.04, 0.12);
+  letters(nile).forEach(function (c, i) { slam(c, 0.58 + i * 0.1, { rotation: i % 2 ? 6 : -6 }); shake(0.58 + i * 0.1, 14); });
+  tl.fromTo([bc1, tri1], { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.2, ease: "power3.out", stagger: 0.05 }, 0.9);
+  flash(0.23, 0.9);
+  tl.to(s1, { scale: 1.25, y: -260, filter: "blur(18px)", duration: 0.2, ease: "power3.in" }, 1.40);
+
+  // ============ S2 · burger build (Seedance) (1.60 – 4.56) ======================================
+  var T2 = 1.60, s2 = scene("#ffa81e"); show(s2, T2, 4.56);
+  var bClip = sequence(s2, "clips/burger", 71); seqs.push({ seq: bClip, start: T2 });
+  el("div", "frame-border", s2);
+  var lbl2 = el("div", "archivo abs", s2, { left: "80px", top: "1800px", fontSize: "44px", color: "#fff", letterSpacing: "4px" }, "01 — THE NILE");
+  // stacked outline type behind the solid word (magazine echo)
+  var echo = [2, 1].map(function (k) { return word(s2, "FRESHLY", "anton outline", 260, { left: "70px", top: (310 - k * 115) + "px", opacity: 0.7 / k }, 940); });
+  var fr = word(s2, "FRESHLY", "anton", 260, { left: "70px", top: "310px", color: "#fff", textShadow: "10px 10px 0 #0b0b0b" }, 940);
+  var gr = word(s2, "GRILLED", "anton", 230, { left: "70px", top: "530px", color: "#0b0b0b" }, 940);
+  tl.fromTo(s2, { y: 340, filter: "blur(16px)" }, { y: 0, filter: "blur(0px)", duration: 0.18, ease: "power3.out" }, T2);
+  tl.fromTo(lbl2, { x: -500 }, { x: 0, duration: 0.25, ease: "power3.out" }, T2 + 0.1);
+  // punch-ins as each layer lands (sequence times: bun 0.29, patty 0.58, cheese cut 0.92, top bun 2.13)
+  [0.29, 0.58, 0.92, 2.13].forEach(function (t, i) {
+    tl.fromTo(bClip.img, { scale: 1.06 }, { scale: 1, duration: 0.25, ease: "power3.out" }, T2 + t);
+  });
+  shake(T2 + 2.13, 10); flash(T2 + 2.13, 0.7);
+  tl.fromTo(echo, { x: -120, opacity: 0 }, { x: 0, opacity: function (i) { return i ? 0.7 : 0.35; }, duration: 0.2, stagger: 0.06, ease: "power3.out" }, T2 + 2.18);
+  slam(letters(fr), T2 + 2.2, { y: -60 }, 0.03);
+  slam(letters(gr), T2 + 2.42, { y: 80 }, 0.03);
+  tl.to(s2, { x: -1080, filter: "blur(22px)", duration: 0.12, ease: "power3.in" }, 4.44);
+
+  // ============ S3 · chapter 01 (4.56 – 5.76) ===================================================
+  var T3 = 4.56, s3 = scene("#ffa81e"); show(s3, 4.44, 5.78);
+  var black3 = el("div", "abs", s3, { inset: "0", background: "var(--black)", clipPath: "polygon(0 64%,100% 50%,100% 100%,0 100%)" });
+  var n01 = word(s3, "01", "anton", 1150, { left: "-30px", top: "40px", color: "#fff", letterSpacing: "-20px" });
+  var cb = el("img", "abs", s3, { left: "40px", top: "700px", width: "1000px" }); cb.src = "assets/cutouts/chicken-burger.png";
+  var fr3 = word(s3, "FRESHLY", "anton", 190, { left: "70px", top: "1380px", color: "#fff" }, 940);
+  var gr3 = word(s3, "GRILLED", "anton", 190, { left: "70px", top: "1560px", color: "var(--coral)" }, 940);
+  var bc3 = barcode(s3, 760, 1720, 250, 90, "01/02", "#ffffff");
+  tl.fromTo(s3, { x: 1080, filter: "blur(22px)" }, { x: 0, filter: "blur(0px)", duration: 0.14, ease: "power3.out" }, 4.44);
+  tl.fromTo(black3, { yPercent: 40 }, { yPercent: 0, duration: 0.25, ease: "power4.out" }, T3 + 0.04);
+  slam(n01, T3 + 0.08, { scale: 2.8 }, 0, 0.18); shake(T3 + 0.12, 16);
+  tl.fromTo(cb, { x: 1100, rotation: -14 }, { x: 0, rotation: -3, duration: 0.24, ease: "power4.out" }, T3 + 0.22);
+  tl.to(cb, { scale: 1.05, duration: 0.9, ease: "none" }, T3 + 0.46);
+  slam(letters(fr3), T3 + 0.36, { y: 90 }, 0.025);
+  slam(letters(gr3), T3 + 0.5, { y: 90 }, 0.025);
+  tl.fromTo(bc3, { opacity: 0 }, { opacity: 1, duration: 0.1 }, T3 + 0.7);
+  tl.to(s3, { x: -1080, filter: "blur(22px)", duration: 0.1, ease: "power3.in" }, 5.66);
+
+  // ============ S4 · photo collage (5.76 – 6.96) ================================================
+  var T4 = 5.76, s4 = scene("#ece8e1"); show(s4, 5.66, 6.96);
+  var vert = word(s4, "THE NILE", "anton", 360, { left: "-40px", top: "1880px", color: "transparent", WebkitTextStroke: "4px #0b0b0b", transformOrigin: "0 0", transform: "rotate(-90deg)" });
+  function photoCard(src, x, y, w, h, rot, pos) {
+    var c = el("div", "card", s4, { left: x + "px", top: y + "px", width: w + "px", height: h + "px", transform: "rotate(" + rot + "deg)" });
+    el("div", "ph", c, { backgroundImage: "url(" + src + ")", backgroundPosition: pos || "center" });
+    return c;
+  }
+  var c1 = photoCard("assets/photos/beef-burger.jpg", 170, 170, 800, 900, -6, "50% 50%");
+  var c2 = photoCard("assets/photos/grilled-chicken.jpg", 300, 860, 700, 760, 5, "50% 50%");
+  var c3 = photoCard("assets/photos/chicken-burger.jpg", 110, 1150, 620, 560, -3, "50% 50%");
+  var tape = el("div", "archivo abs", s4, { left: "40px", top: "1640px", padding: "18px 34px", background: "var(--black)", color: "#fff", fontSize: "64px", transform: "rotate(-4deg)", letterSpacing: "2px" }, "FRESHLY GRILLED");
+  var sq4 = [0, 1, 2].map(function (i) { return el("div", "sq", s4, { left: (860 + i * 40) + "px", top: "90px", background: i === 2 ? "var(--coral)" : "var(--black)" }); });
+  var bc4 = barcode(s4, 700, 1760, 300, 80, "THE NILE", "#0b0b0b");
+  tl.fromTo(s4, { x: 1080, filter: "blur(22px)" }, { x: 0, filter: "blur(0px)", duration: 0.12, ease: "power3.out" }, 5.66);
+  tl.fromTo(vert, { opacity: 0 }, { opacity: 1, duration: 0.2 }, T4 + 0.05);
+  [c1, c2, c3].forEach(function (c, i) {
+    tl.fromTo(c, { scale: 1.5, opacity: 0, y: -80 }, { scale: 1, opacity: 1, y: 0, duration: 0.16, ease: "power4.out" }, T4 + 0.06 + i * 0.2);
+    shake(T4 + 0.16 + i * 0.2, 12);
+  });
+  tl.to([c1, c2, c3], { y: "-=30", duration: 1.0, ease: "none" }, T4 + 0.2);
+  tl.fromTo(tape, { scaleX: 0, transformOrigin: "0 50%" }, { scaleX: 1, duration: 0.18, ease: "power4.out" }, T4 + 0.66);
+  tl.fromTo(sq4, { scale: 0 }, { scale: 1, duration: 0.1, stagger: 0.04, ease: "back.out(3)" }, T4 + 0.7);
+  tl.fromTo(bc4, { opacity: 0 }, { opacity: 1, duration: 0.08 }, T4 + 0.8);
+  tl.to(s4, { scale: 2.6, filter: "blur(26px)", opacity: 0, duration: 0.14, ease: "power3.in" }, 6.82);
+
+  // ============ S5 · pizza "vinyl" (6.96 – 8.16) ================================================
+  var T5 = 6.96, s5 = scene("#0b0b0b"); show(s5, T5, 8.16);
+  var rays = el("div", "abs", s5, { left: "-960px", top: "-480px", width: "3000px", height: "3000px",
+    background: "repeating-conic-gradient(rgba(255,168,30,0.10) 0deg 4deg, rgba(0,0,0,0) 4deg 12deg)" });
+  var disc = el("div", "abs", s5, { left: "40px", top: "460px", width: "1000px", height: "1000px", borderRadius: "50%",
+    background: "conic-gradient(from 20deg, rgba(255,255,255,0.10), rgba(255,255,255,0) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0) 75%, rgba(255,255,255,0.10)), repeating-radial-gradient(circle, #0e0e0e 0 4px, #2e2e2e 4px 6px)", boxShadow: "0 0 0 10px #0b0b0b, 0 40px 80px rgba(0,0,0,0.6)" });
+  var pz = el("img", "abs", s5, { left: "125px", top: "520px", width: "830px" }); pz.src = "assets/cutouts/pizza.png";
+  var ring = el("div", "abs", s5, { left: "0", top: "420px", width: "1080px", height: "1080px" },
+    '<svg width="1080" height="1080" viewBox="0 0 1080 1080"><defs><path id="circ" d="M540,540 m-505,0 a505,505 0 1,1 1010,0 a505,505 0 1,1 -1010,0"/></defs>' +
+    '<text font-family="Archivo Black" font-size="60" letter-spacing="7" fill="#fff"><textPath href="#circ">FULL OF FLAVOUR • FULL OF FLAVOUR • FULL OF FLAVOUR • FULL OF FLAVOUR •</textPath></text></svg>');
+  var st1 = star(s5, 30, 150, 330, "#ffa81e", 9), st2 = star(s5, 760, 1450, 270, "#ef6f4c", 8);
+  var lbl5 = word(s5, "THE NILE", "anton", 140, { left: "410px", top: "200px", color: "#fff" });
+  tl.fromTo(s5, { scale: 0.4, rotation: -30 }, { scale: 1, rotation: 0, duration: 0.24, ease: "power4.out" }, T5);
+  tl.fromTo(rays, { rotation: 0 }, { rotation: 40, duration: 1.2, ease: "none" }, T5);
+  tl.fromTo([disc, pz], { rotation: 0 }, { rotation: -260, duration: 1.2, ease: "power2.out" }, T5);
+  tl.fromTo(ring, { rotation: 0, opacity: 0 }, { rotation: 70, opacity: 1, duration: 1.2, ease: "power1.out" }, T5);
+  tl.fromTo(st1, { scale: 0, rotation: -90 }, { scale: 1, rotation: 0, duration: 0.2, ease: "back.out(2.5)" }, T5 + 0.3);
+  tl.fromTo(st2, { scale: 0, rotation: 90 }, { scale: 1, rotation: 0, duration: 0.2, ease: "back.out(2.5)" }, T5 + 0.5);
+  tl.to([st1, st2], { rotation: "+=25", duration: 0.7, ease: "none" }, T5 + 0.52);
+  slam(letters(lbl5), T5 + 0.62, { y: 40 }, 0.03);
+  flash(8.12, 1);
+
+  // ============ S6 · pizza cheese pull (Seedance) (8.16 – 10.96) ================================
+  var T6 = 8.16, s6 = scene("#ffa81e"); show(s6, T6, 10.96);
+  var pClip = sequence(s6, "clips/pizza", 73); seqs.push({ seq: pClip, start: T6 });
+  el("div", "frame-border", s6);
+  var n02 = word(s6, "02", "anton outline", 420, { left: "70px", top: "90px" });
+  var lbl6 = el("div", "archivo abs", s6, { left: "70px", top: "1700px", padding: "20px 36px", background: "#fff", color: "var(--black)", fontSize: "60px", letterSpacing: "2px" }, "FULL OF FLAVOUR");
+  var tag6 = el("div", "archivo abs", s6, { left: "560px", top: "130px", fontSize: "44px", color: "#fff", letterSpacing: "4px", textAlign: "right", width: "440px" }, "THE NILE");
+  slam(n02, T6 + 0.04, { scale: 2.6 }, 0, 0.18); shake(T6 + 0.08, 12);
+  tl.fromTo(tag6, { x: 300, opacity: 0 }, { x: 0, opacity: 1, duration: 0.22, ease: "power3.out" }, T6 + 0.2);
+  tl.fromTo(lbl6, { x: -900 }, { x: 0, duration: 0.24, ease: "power4.out" }, T6 + 1.1);
+  tl.fromTo(pClip.img, { scale: 1.0 }, { scale: 1.06, duration: 2.8, ease: "none" }, T6);
+  tl.to(s6, { y: -1920, filter: "blur(24px)", duration: 0.12, ease: "power3.in" }, 10.84);
+
+  // ============ S7 · FULL OF FLAVOUR (10.96 – 12.16) ============================================
+  var T7 = 10.96, s7 = scene("#b3141b"); show(s7, 10.84, 12.16);
+  el("div", "abs", s7, { inset: "0", background: "radial-gradient(70% 55% at 50% 45%, rgba(255,90,60,0.35), rgba(0,0,0,0.35))" });
+  var full = word(s7, "FULL", "anton", 560, { left: "60px", top: "100px", color: "var(--cream)" }, 960);
+  var of = word(s7, "OF", "anton", 220, { left: "66px", top: "600px", color: "var(--orange)" });
+  var flav = word(s7, "FLAVOUR", "anton", 400, { left: "50px", top: "820px", color: "var(--cream)", textShadow: "12px 12px 0 #0b0b0b" }, 980);
+  var swoosh = el("div", "abs", s7, { left: "0", top: "0", width: "1080px", height: "1920px" },
+    '<svg width="1080" height="1920"><path id="sw" d="M320,720 C470,620 600,800 760,700 S930,610 990,650" fill="none" stroke="#fff" stroke-width="8" stroke-dasharray="22 18" stroke-linecap="round"/>' +
+    '<polygon id="plane" points="0,-26 60,0 0,26 12,0" fill="#ffa81e" stroke="#0b0b0b" stroke-width="4" transform="translate(990,650) rotate(30)"/></svg>');
+  var plate = el("img", "abs", s7, { left: "110px", top: "1130px", width: "860px" }); plate.src = "assets/cutouts/grilled-chicken.png";
+  var mask7 = el("div", "abs", s7, { left: "0", top: "0", width: "1080px", height: "1920px", pointerEvents: "none" });
+  tl.fromTo(s7, { y: 1920, filter: "blur(24px)" }, { y: 0, filter: "blur(0px)", duration: 0.12, ease: "power3.out" }, 10.84);
+  slam(letters(full), T7 + 0.06, { y: -120 }, 0.035); shake(T7 + 0.12, 14);
+  slam(of, T7 + 0.24, { scale: 3, rotation: 20 }, 0, 0.14);
+  slam(letters(flav), T7 + 0.36, { y: 140 }, 0.03); shake(T7 + 0.5, 12);
+  tl.fromTo(plate, { y: 900, rotation: 12 }, { y: 0, rotation: 0, duration: 0.3, ease: "power4.out" }, T7 + 0.42);
+  var swPath = swoosh.querySelector("#sw"), plane = swoosh.querySelector("#plane");
+  tl.fromTo(swPath, { attr: { "stroke-dashoffset": 1400 }, opacity: 1, strokeDasharray: "1400 1400" }, { attr: { "stroke-dashoffset": 0 }, duration: 0.45, ease: "power2.out" }, T7 + 0.5);
+  tl.set(swPath, { strokeDasharray: "22 18" }, T7 + 0.96);
+  tl.fromTo(plane, { opacity: 0 }, { opacity: 1, duration: 0.05 }, T7 + 0.9);
+  tl.to(s7, { scale: 0.5, borderRadius: "80px", opacity: 0, filter: "blur(10px)", duration: 0.12, ease: "power3.in" }, 12.04);
+
+  // ============ S8 · phone UI insert (12.16 – 13.06) ============================================
+  var T8 = 12.16, s8 = scene("#000"); show(s8, T8, 13.06);
+  var noti = el("div", "widget", s8, { left: "60px", top: "330px", width: "960px", height: "250px", background: "#2a2a2c" });
+  var nIcon = el("div", "abs", noti, { left: "36px", top: "40px", width: "120px", height: "120px", borderRadius: "30px", background: "var(--coral)" });
+  var nTri = el("img", "abs", nIcon, { left: "14px", top: "16px", width: "92px" }); nTri.src = "assets/logo-triangle.png";
+  el("div", "mont abs", noti, { left: "186px", top: "48px", fontSize: "44px", color: "#fff" }, "THE NILE");
+  el("div", "mont abs", noti, { left: "770px", top: "52px", fontSize: "34px", color: "#8e8e93" }, "now");
+  el("div", "mont abs", noti, { left: "186px", top: "116px", fontSize: "40px", color: "#d1d1d6" }, "Freshly grilled. Full of flavour.");
+  var app = el("div", "widget", s8, { left: "60px", top: "650px", width: "960px", height: "430px" });
+  var aIcon = el("div", "abs", app, { left: "60px", top: "60px", width: "310px", height: "310px", borderRadius: "70px", background: "var(--coral)" });
+  var aTri = el("img", "abs", aIcon, { left: "40px", top: "50px", width: "230px" }); aTri.src = "assets/logo-triangle.png";
+  el("div", "mont abs", app, { left: "420px", top: "120px", fontSize: "76px", color: "#fff", fontWeight: 900 }, "The Nile");
+  el("div", "mont abs", app, { left: "420px", top: "230px", fontSize: "44px", color: "#8e8e93" }, "Freshly grilled");
+  var tog = el("div", "widget", s8, { left: "60px", top: "1150px", width: "960px", height: "220px" });
+  el("div", "mont abs", tog, { left: "60px", top: "78px", fontSize: "56px", color: "#fff" }, "Full of flavour");
+  var track = el("div", "abs", tog, { left: "700px", top: "62px", width: "200px", height: "100px", borderRadius: "50px", background: "#3a3a3c" });
+  var knob = el("div", "abs", track, { left: "6px", top: "6px", width: "88px", height: "88px", borderRadius: "50%", background: "#fff", boxShadow: "0 4px 10px rgba(0,0,0,0.4)" });
+  tl.fromTo([app, tog], { y: 260, opacity: 0 }, { y: 0, opacity: 1, duration: 0.24, ease: "power4.out", stagger: 0.06 }, T8);
+  tl.fromTo(noti, { y: -500 }, { y: 0, duration: 0.3, ease: "back.out(1.6)" }, T8 + 0.2);
+  tl.to(knob, { x: 100, duration: 0.16, ease: "power2.inOut" }, T8 + 0.48);
+  tl.to(track, { backgroundColor: "#ef6f4c", duration: 0.16 }, T8 + 0.48);
+  tl.to(s8, { opacity: 0, filter: "blur(16px)", scale: 1.1, duration: 0.12, ease: "power2.in" }, 12.94);
+
+  // ============ S9 · end card (13.06 – 14.50) ===================================================
+  var T9 = 13.06, s9 = scene("#000"); show(s9, T9, 14.5);
+  var logo = el("img", "abs", s9, { left: "130px", top: "560px", width: "820px" }); logo.src = "assets/logo-stacked.png";
+  var line9 = el("div", "abs", s9, { left: "240px", top: "1240px", width: "600px", height: "4px", background: "var(--coral)", transformOrigin: "50% 50%" });
+  var sub9 = el("div", "mont abs", s9, { left: "0", top: "1290px", width: "1080px", textAlign: "center", fontSize: "38px", letterSpacing: "8px", color: "#fff" }, "FRESHLY GRILLED · FULL OF FLAVOUR");
+  tl.fromTo(logo, { scale: 1.18, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "power3.out" }, T9 + 0.04);
+  tl.set(logo, { opacity: 0.25 }, T9 + 0.14); tl.set(logo, { opacity: 1 }, T9 + 0.18);
+  tl.fromTo(line9, { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power3.out" }, T9 + 0.35);
+  tl.fromTo(sub9, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "power3.out" }, T9 + 0.45);
+  tl.to(s9, { opacity: 0, duration: 0.25, ease: "power1.in" }, 14.22);
+
+  // grain drifts every frame
+  tl.fromTo("#grain", { x: 0, y: 0 }, { x: 0, y: 0, duration: DUR, ease: "none", onUpdate: function () {
+    var f = Math.floor(tl.time() * FPS); document.getElementById("grain").style.transform = "translate(" + ((f * 73) % 200 - 100) + "px," + ((f * 131) % 200 - 100) + "px)";
+  } }, 0);
+
+  function syncClips(t) { seqs.forEach(function (s) { s.seq.show(Math.max(0, t - s.start)); }); }
+  tl.eventCallback("onUpdate", function () { syncClips(tl.time()); });
+
+  // seek(t): returns a promise that resolves when that exact frame is ready to grab
+  function seek(t) {
+    tl.time(t, false); syncClips(t);
+    return Promise.all(seqs.map(function (s) { var im = s.seq.img; return im.complete ? im.decode().catch(function () {}) : new Promise(function (r) { im.onload = r; }); }));
+  }
+  window.NILE_KINETIC = { tl: tl, seek: seek, fps: FPS, duration: DUR };
+
+  var preload = [].concat.apply([], seqs.map(function (s) { return s.seq.cache; })).concat(Array.prototype.slice.call(document.images));
+  return Promise.all(preload.map(function (im) { return im.complete ? 0 : new Promise(function (r) { im.onload = im.onerror = r; }); }));
+  }
+
+  Promise.all([document.fonts.load("100px Anton"), document.fonts.load("100px 'Archivo Black'"), document.fonts.load("800 40px Montserrat"), document.fonts.load("900 40px Montserrat")])
+    .then(build)
+    .then(function () {
+      var K = window.NILE_KINETIC;
+      if (q.has("t")) K.seek(parseFloat(q.get("t"))); else if (!q.has("capture")) K.tl.play(0); else K.seek(0);
+      document.body.setAttribute("data-ready", "1");
+    });
+})();
+</script>
+</body>
+</html>

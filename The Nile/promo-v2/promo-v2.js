@@ -231,6 +231,23 @@
       fill: "none", stroke: "#fffaf3", "stroke-width": 20, "stroke-linecap": "round", filter: "url(#roughSoft)" }, panelSvg);
     sc.titleWrap = tw;
 
+    if (OPT.moldedTitle) {
+      // dark brush shape that hugs the letters (instead of a rectangle): a copy of the title drawn
+      // behind it with a very thick dark outline, given the same rough brush edge as the panel
+      sc.panel.style.display = "none";
+      sc.back = el("div", "title title-back", tw);
+      tw.insertBefore(sc.back, sc.title);
+      sc.back.style.fontSize = sc.title.style.fontSize;
+      sc.lines.forEach(function (l, li) {
+        var line = el("div", "line " + (it.title[li][1] || "w"), sc.back);
+        l.back = Array.from(it.title[li][0]).map(function (c) { return el("span", "ch", line, c === " " ? " " : c); });
+      });
+      // the underline sits on the same dark shape
+      sc.underBack = sv("path", { d: sc.underline.getAttribute("d"), fill: "none", stroke: "#2a1206", "stroke-width": 84,
+        "stroke-linecap": "round", filter: "url(#rough)" }, panelSvg);
+      panelSvg.insertBefore(sc.underBack, sc.underline);
+    }
+
     // front graphics: action marks, arrow, logo badge, motion lines, zigzag
     var front = svgLayer(sc.root);
     var gA = sv("g", { fill: "none", stroke: "#ffffff", "stroke-width": 10, "stroke-linecap": "round", "stroke-linejoin": "round" }, front);
@@ -307,6 +324,11 @@
     tl.to(p, { scale: 0.985 * z, duration: 1.05, ease: "power3.out" }, 0.15);
     tl.to(p, { x: 0, duration: 0.7, ease: "sine.inOut" }, 1.1);
     tl.to(p, { scale: z, duration: 0.8, ease: "sine.inOut" }, 1.2);
+    // the soft left-edge fade is only needed while the photo slides in; once its edge is off-screen
+    // the fade is switched off, because it makes the browser draw the whole photo noticeably softer
+    var FADE = "linear-gradient(to right, transparent 0, #000 140px)";
+    tl.set(p, { webkitMaskImage: FADE, maskImage: FADE }, 0);
+    tl.set(p, { webkitMaskImage: "none", maskImage: "none" }, 1.2);
 
     // background brush smears paint across
     sc.smears.forEach(function (s, i) { drawIn(tl, s, 0.2 + i * 0.12, 0.55); });
@@ -316,17 +338,20 @@
     // title: panel wipes in, letters slam on one by one, shake, underline draws
     var at = 1.0;
     tl.set(sc.chars, { autoAlpha: 0 }, 0);
+    sc.lines.forEach(function (l) { if (l.back) tl.set(l.back, { autoAlpha: 0 }, 0); });
     tl.fromTo(sc.panel, { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% -5% 0% 0%)", duration: 0.4, ease: "power3.out" }, at);
     var t = at + 0.2;
     sc.lines.forEach(function (l, li) {
       l.chars.forEach(function (c, i) {
         var r = (((li * 7 + i) * 37) % 24) - 12;
-        tl.fromTo(c, { autoAlpha: 0, scale: 2.3, rotation: r, y: -30 }, { autoAlpha: 1, scale: 1, rotation: 0, y: 0, duration: 0.32, ease: "power4.out" }, t + i * 0.045);
+        var targets = l.back ? [c, l.back[i]] : c;     // the dark shape slams in with each letter
+        tl.fromTo(targets, { autoAlpha: 0, scale: 2.3, rotation: r, y: -30 }, { autoAlpha: 1, scale: 1, rotation: 0, y: 0, duration: 0.32, ease: "power4.out" }, t + i * 0.045);
       });
       t += l.chars.length * 0.045 + 0.12;
     });
     tl.to(sc.titleWrap, { keyframes: { x: [10, -8, 6, -3, 0] }, duration: 0.35, ease: "none" }, t);
     tl.set(sc.underline, { autoAlpha: 0 }, 0);
+    if (sc.underBack) { tl.set(sc.underBack, { autoAlpha: 0 }, 0); drawIn(tl, sc.underBack, t - 0.14, 0.35); }
     drawIn(tl, sc.underline, t - 0.1, 0.35);
 
     // the rest of the graphics
