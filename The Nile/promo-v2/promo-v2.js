@@ -307,6 +307,11 @@
     tl.to(p, { scale: 0.985 * z, duration: 1.05, ease: "power3.out" }, 0.15);
     tl.to(p, { x: 0, duration: 0.7, ease: "sine.inOut" }, 1.1);
     tl.to(p, { scale: z, duration: 0.8, ease: "sine.inOut" }, 1.2);
+    // the soft left-edge fade is only needed while the photo slides in; once its edge is off-screen
+    // the fade is switched off, because it makes the browser draw the whole photo noticeably softer
+    var FADE = "linear-gradient(to right, transparent 0, #000 140px)";
+    tl.set(p, { webkitMaskImage: FADE, maskImage: FADE }, 0);
+    tl.set(p, { webkitMaskImage: "none", maskImage: "none" }, 1.2);
 
     // background brush smears paint across
     sc.smears.forEach(function (s, i) { drawIn(tl, s, 0.2 + i * 0.12, 0.55); });
