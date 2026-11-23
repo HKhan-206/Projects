@@ -565,6 +565,37 @@
   }
 
   /* =====================================================================
+     VIDEO SLIDES – a finished full-screen video (e.g. the kinetic photo edit)
+     ===================================================================== */
+  function buildVideo(p) {
+    var sc = { p: p, video: true };
+    sc.root = el("section", "scene", stage);
+    sc.root.style.background = "#000";
+    var v = el("video", null, sc.root);
+    v.muted = true; v.defaultMuted = true; v.playsInline = true; v.preload = "auto";
+    v.setAttribute("muted", ""); v.setAttribute("playsinline", "");
+    Object.assign(v.style, { position: "absolute", left: 0, top: 0, width: W + "px", height: H + "px", objectFit: "cover" });
+    [].concat(p.src).forEach(function (src) {
+      var so = document.createElement("source"); so.src = src;
+      so.type = /\.webm$/.test(src) ? "video/webm" : "video/mp4"; v.appendChild(so);
+    });
+    sc.v = v;
+    return sc;
+  }
+  function videoTimeline(sc, dur) {
+    var tl = gsap.timeline(), v = sc.v, vp = { t: 0 }, stepped = params.has("capture") || freezeAt != null;
+    // the video plays by itself; the timeline only starts it and pulls it back in line if it drifts
+    if (!stepped) tl.call(function () { try { v.currentTime = 0; v.play().catch(function () {}); } catch (e) {} }, null, 0.001);
+    tl.fromTo(vp, { t: 0 }, { t: dur, duration: dur, ease: "none", onUpdate: function () {
+      if (stepped) { v.currentTime = Math.min(vp.t, dur - 0.05); return; }
+      if (v.paused && vp.t < dur - 0.3) v.play().catch(function () {});
+      if (Math.abs(v.currentTime - vp.t) > 0.35) v.currentTime = vp.t;
+    } }, 0);
+    tl.call(function () { try { v.pause(); } catch (e) {} }, null, dur);
+    return tl;
+  }
+
+  /* =====================================================================
      TRANSITIONS + PLAYBACK
      ===================================================================== */
   var bandA, bandB, BELOW = 2700, COVER = -1250, ABOVE = -5200;
@@ -589,7 +620,7 @@
   var slides = CFG.slides.filter(function (s) { return s.enabled !== false && (!only || s.id === only); });
 
   function play() {
-    var scenes = slides.map(function (s, i) { return s.type === "slogan" ? buildSlogan(s) : buildFood(s, i); });
+    var scenes = slides.map(function (s, i) { return s.type === "slogan" ? buildSlogan(s) : s.type === "video" ? buildVideo(s) : buildFood(s, i); });
     var flash = el("div", "flash", stage);
     buildWipe();
     var roots = scenes.map(function (s) { return s.root; });
@@ -598,6 +629,7 @@
     scenes.forEach(function (sc, i) {
       var built, dur;
       if (sc.slogan) { built = sloganTimeline(sc, sc.p); dur = built.dur; built = built.tl; }
+      else if (sc.video) { dur = sc.p.seconds; built = videoTimeline(sc, dur); }
       else { built = foodTimeline(sc, T); dur = T; }
       starts.push({ id: sc.p ? sc.p.id : sc.it.id, at: t });
       master.set(roots, { autoAlpha: 0 }, t);
@@ -605,7 +637,7 @@
       master.add(built, t);
       // how this slide hands over to the next: flash between food slides, diagonal wipe around slogans
       var next = scenes[(i + 1) % scenes.length];
-      var useWipe = sc.slogan || next.slogan;
+      var useWipe = sc.slogan || next.slogan || sc.video || next.video;
       if (useWipe) { wipeIn(master, t + dur); wipeOut(master, t + dur); }
       else {
         master.to(flash, { opacity: 1, duration: 0.16, ease: "power2.in" }, t + dur - 0.16);
@@ -631,7 +663,7 @@
   function loadImg(src) {
     return new Promise(function (res) { var im = new Image(); im.onload = function () { (im.decode ? im.decode().catch(function () {}) : Promise.resolve()).then(res); }; im.onerror = res; im.src = src; });
   }
-  var loads = slides.filter(function (s) { return s.type !== "slogan"; }).map(function (s) { return loadImg("images/items/" + s.id + ".jpg"); })
+  var loads = slides.filter(function (s) { return !s.type; }).map(function (s) { return loadImg("images/items/" + s.id + ".jpg"); })
     .concat([loadImg(CFG.badge), loadImg(CFG.logo)]);
   if (document.fonts) { loads.push(document.fonts.load("200px Brush")); loads.push(document.fonts.load("900 40px Montserrat")); loads.push(document.fonts.load("800 40px Montserrat")); }
   Promise.all(loads).then(play);

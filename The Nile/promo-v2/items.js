@@ -20,6 +20,10 @@
              font ("brush" = same lettering as the food titles)
      ghost = giant faint word drifting behind   logo = "center" or "top"
      hold  = seconds to hold                    out  = whipL, whipR, up, down, zoom, fade, none
+
+   VIDEO SLIDES (type: "video") – a finished full-screen 1080 x 1920 video, no sound.
+     src     = the video file(s); the first one the screen can play is used
+     seconds = how long it stays on screen (the length of the video)
    ===================================================================== */
 
 window.PROMO2 = {
@@ -99,6 +103,12 @@ window.PROMO2 = {
       tagline: ["EXTRA CRUNCHY", "CRAVINGS SORTED"],
       layerW: 1536, layerH: 2402,   // size of the extended photo – do not edit
       bgStops: [[0.0, "#fd8010"], [3.3, "#fd8010"], [6.7, "#fd8010"], [10.0, "#fd8010"], [13.3, "#fd8010"], [16.7, "#fd7f10"], [20.0, "#fd7f10"], [23.3, "#fd7f0f"], [26.6, "#fd7f10"], [30.0, "#fd7f0f"], [33.3, "#fd7f10"], [36.6, "#fd7f10"], [40.0, "#fd7f12"], [43.3, "#fe8115"], [46.6, "#fe8115"], [50.0, "#fe8115"], [53.3, "#fd8014"], [56.6, "#fd7e13"], [60.0, "#fd7e13"], [63.3, "#fe7e11"], [66.6, "#fd7d12"], [69.9, "#fd8111"], [73.3, "#fd8413"], [76.6, "#fd8413"], [79.9, "#fd8515"], [83.3, "#fc8214"], [86.6, "#fc8113"], [89.9, "#fc8113"], [93.3, "#fc8113"], [96.6, "#fc8113"], [99.9, "#fc8113"], [100, "#fc8113"]]
+    },
+    {
+      id: "kinetic-photo-edit",
+      type: "video",
+      src: ["videos/the-nile-kinetic-photo-edit.mp4", "videos/the-nile-kinetic-photo-edit.webm"],
+      seconds: 14.5
     },
     {
       id: "bubblegum-millions-milkshake",
